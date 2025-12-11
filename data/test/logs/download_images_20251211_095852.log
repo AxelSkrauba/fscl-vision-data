@@ -1,0 +1,15 @@
+2025-12-11 09:58:52,063 - download_images - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 09:58:52,063 - download_images - INFO - Loaded 0 observations from data\test\cache\observations.json
+2025-12-11 09:58:52,063 - download_images - INFO - Starting download with 2 workers...
+2025-12-11 09:58:52,063 - download_images - INFO - Starting download of 0 images...
+2025-12-11 09:58:52,064 - download_images - INFO - Download complete: 0 downloaded, 0 skipped, 0 failed in 0.0s (0.0 MB)
+2025-12-11 09:58:52,064 - download_images - INFO - ==================================================
+2025-12-11 09:58:52,064 - download_images - INFO - DOWNLOAD SUMMARY
+2025-12-11 09:58:52,065 - download_images - INFO - ==================================================
+2025-12-11 09:58:52,065 - download_images - INFO - Total images: 0
+2025-12-11 09:58:52,065 - download_images - INFO - Downloaded: 0
+2025-12-11 09:58:52,065 - download_images - INFO - Skipped (existing): 0
+2025-12-11 09:58:52,066 - download_images - INFO - Failed: 0
+2025-12-11 09:58:52,066 - download_images - INFO - Total size: 0.0 MB
+2025-12-11 09:58:52,066 - download_images - INFO - Time: 0.0 seconds
+2025-12-11 09:58:52,066 - download_images - INFO - ==================================================

@@ -1,0 +1,22 @@
+2025-12-11 10:17:48,480 - deduplicate - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:17:48,516 - deduplicate - INFO - Loaded 40 observations
+2025-12-11 10:17:48,517 - deduplicate - INFO - Deduplication parameters: spatial=200m, temporal=3d
+2025-12-11 10:17:48,520 - deduplicate - INFO - Turdus rufiventris: 20 -> 12 (40.0% dedup)
+2025-12-11 10:17:48,522 - deduplicate - INFO - Ramphastos toco: 19 -> 18 (5.3% dedup)
+2025-12-11 10:17:48,522 - deduplicate - INFO - Ramphastos toco albogularis: 1 -> 1 (0.0% dedup)
+2025-12-11 10:17:48,523 - deduplicate - INFO - ==================================================
+DEDUPLICATION SUMMARY
+==================================================
+Total original observations: 40
+Unique individuals identified: 31
+Duplicates removed: 9
+Overall dedup rate: 22.5%
+
+By species:
+------------------------------
+  Turdus rufiventris: 20 -> 12 (40.0% removed)
+  Ramphastos toco: 19 -> 18 (5.3% removed)
+  Ramphastos toco albogularis: 1 -> 1 (0.0% removed)
+==================================================
+2025-12-11 10:17:48,661 - deduplicate - INFO - Saved 31 deduplicated observations to data\test\cache\observations_deduplicated.json
+2025-12-11 10:17:48,662 - deduplicate - INFO - Saved deduplication stats to data\test\cache\deduplication_stats.json

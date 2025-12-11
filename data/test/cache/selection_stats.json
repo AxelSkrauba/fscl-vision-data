@@ -1,0 +1,13 @@
+{
+  "method": "quality",
+  "total_candidates": 25,
+  "total_selected": 19,
+  "by_species": {
+    "12738": 9,
+    "18793": 10
+  },
+  "parameters": {
+    "samples_per_species": 10,
+    "min_samples_per_species": 5
+  }
+}

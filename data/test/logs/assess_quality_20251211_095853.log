@@ -1,0 +1,4 @@
+2025-12-11 09:58:53,181 - assess_quality - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 09:58:53,181 - assess_quality - INFO - Loaded 0 observations
+2025-12-11 09:58:53,182 - assess_quality - INFO - Found 0 images to assess
+2025-12-11 09:58:53,182 - assess_quality - ERROR - No images found. Run 02_download_images.py first

@@ -1,0 +1,27 @@
+{
+  "observation_id": 291332256,
+  "photo_id": 524164127,
+  "species": "Turdus rufiventris",
+  "species_id": 12738,
+  "common_name": "Rufous-bellied Thrush",
+  "rank": "species",
+  "observed_on": "2025-06-20",
+  "time_observed_at": "2025-06-20T08:47:13-03:00",
+  "created_at": "2025-06-20T20:12:13-03:00",
+  "location": {
+    "latitude": null,
+    "longitude": null,
+    "accuracy_m": 15,
+    "place_guess": "Oberá, AR-MN, AR"
+  },
+  "user": {
+    "id": 3618207,
+    "login": "latalo"
+  },
+  "quality_grade": "research",
+  "license_code": "cc-by-nc",
+  "attribution": "(c) Andrea Talone Rìo, some rights reserved (CC BY-NC)",
+  "url_original": "https://inaturalist-open-data.s3.amazonaws.com/photos/524164127/square.jpg",
+  "faves_count": 0,
+  "comments_count": 0
+}

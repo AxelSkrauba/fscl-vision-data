@@ -1,0 +1,27 @@
+{
+  "observation_id": 296354370,
+  "photo_id": 533592150,
+  "species": "Turdus rufiventris",
+  "species_id": 12738,
+  "common_name": "Rufous-bellied Thrush",
+  "rank": "species",
+  "observed_on": "2025-06-04",
+  "time_observed_at": "2025-06-04T08:19:00-03:00",
+  "created_at": "2025-07-08T18:32:08-03:00",
+  "location": {
+    "latitude": null,
+    "longitude": null,
+    "accuracy_m": null,
+    "place_guess": "Puerto Iguazú, Misiones, Argentina"
+  },
+  "user": {
+    "id": 144,
+    "login": "trekman"
+  },
+  "quality_grade": "research",
+  "license_code": "cc-by-nc-sa",
+  "attribution": "(c) Gustavo Fernando Durán, some rights reserved (CC BY-NC-SA)",
+  "url_original": "https://inaturalist-open-data.s3.amazonaws.com/photos/533592150/square.jpg",
+  "faves_count": 0,
+  "comments_count": 0
+}

@@ -1,0 +1,22 @@
+2025-12-11 09:58:53,207 - organize_dataset - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 09:58:53,208 - organize_dataset - INFO - Loaded 0 observations from data\test\cache\observations_selected.json
+2025-12-11 09:58:53,208 - organize_dataset - INFO - Organizing dataset: test_region_dataset
+2025-12-11 09:58:53,208 - organize_dataset - INFO - Output directory: data\test\final_datasets
+2025-12-11 09:58:53,213 - organize_dataset - INFO - Dataset 'test_region_dataset' organized: 0 images, 0 species
+2025-12-11 09:58:53,213 - organize_dataset - INFO - Validating dataset...
+2025-12-11 09:58:53,214 - organize_dataset - INFO - Validation complete: {'total_species': 0, 'total_images_manifest': 0, 'total_images_checked': 0, 'missing_images': 0}
+2025-12-11 09:58:53,215 - organize_dataset - INFO - ==================================================
+2025-12-11 09:58:53,215 - organize_dataset - INFO - DATASET ORGANIZATION COMPLETE
+2025-12-11 09:58:53,215 - organize_dataset - INFO - ==================================================
+2025-12-11 09:58:53,216 - organize_dataset - INFO - Dataset path: data\test\final_datasets\test_region_dataset
+2025-12-11 09:58:53,216 - organize_dataset - INFO - Total species: 0
+2025-12-11 09:58:53,216 - organize_dataset - INFO - Total images: 0
+2025-12-11 09:58:53,217 - organize_dataset - INFO - Validation: PASSED
+2025-12-11 09:58:53,217 - organize_dataset - INFO - 
+2025-12-11 09:58:53,217 - organize_dataset - INFO - Generated files:
+2025-12-11 09:58:53,218 - organize_dataset - INFO -   data\test\final_datasets\test_region_dataset\species_manifest.json
+2025-12-11 09:58:53,218 - organize_dataset - INFO -   data\test\final_datasets\test_region_dataset\dataset_metadata.yaml
+2025-12-11 09:58:53,219 - organize_dataset - INFO -   data\test\final_datasets\test_region_dataset\statistics.json
+2025-12-11 09:58:53,219 - organize_dataset - INFO -   data\test\final_datasets\test_region_dataset\README.md
+2025-12-11 09:58:53,219 - organize_dataset - INFO -   data\test\final_datasets\test_region_dataset\images
+2025-12-11 09:58:53,220 - organize_dataset - INFO - ==================================================

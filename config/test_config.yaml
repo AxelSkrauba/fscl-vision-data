@@ -1,0 +1,50 @@
+# FSCL-Vision Data Pipeline - Test Configuration
+# Configuracion minima para testing rapido del pipeline
+
+geography:
+  region_name: "Test Region - Misiones AR"
+  place_id: 10422  # Misiones, Argentina (correcto)
+
+fauna:
+  taxa:
+    # Solo 2 especies para test rapido (IDs verificados en iNaturalist)
+    - name: "Turdus rufiventris"
+      taxon_id: 12738
+      common_names: ["Rufous-bellied Thrush", "Zorzal colorado"]
+      max_observations: 20
+
+    - name: "Ramphastos toco"
+      taxon_id: 18793
+      common_names: ["Toco Toucan", "Tucan grande"]
+      max_observations: 20
+
+quality:
+  minimum_width: 200
+  minimum_height: 200
+  quality_score_threshold: 30
+  max_blur_detected: 50
+
+deduplication:
+  spatial_threshold_m: 200
+  temporal_threshold_days: 3
+
+sampling:
+  method: "quality"
+  samples_per_species: 10
+  min_samples_per_species: 5
+
+data_dir: "./data/test"
+cache_dir: "./data/test/cache"
+raw_dir: "./data/test/raw"
+output_dir: "./data/test/final_datasets"
+
+api:
+  rate_limit_requests_per_minute: 60
+  rate_limit_requests_per_day: 500
+  max_retries: 2
+  timeout_seconds: 20
+  download_workers: 2
+
+logging:
+  level: "DEBUG"
+  log_dir: "./data/test/logs"

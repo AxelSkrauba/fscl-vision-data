@@ -1,0 +1,21 @@
+2025-12-11 10:18:02,814 - assess_quality - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:18:02,844 - assess_quality - INFO - Loaded 31 observations
+2025-12-11 10:18:02,847 - assess_quality - INFO - Found 30 images to assess
+2025-12-11 10:18:02,847 - assess_quality - INFO - Assessing image quality...
+2025-12-11 10:18:05,790 - assess_quality - INFO - Quality assessment complete: 30/30 images
+2025-12-11 10:18:05,791 - assess_quality - INFO - Quality filter: 25/30 passed (min=30)
+2025-12-11 10:18:05,904 - assess_quality - INFO - Saved 25 quality-filtered observations to data\test\cache\observations_quality.json
+2025-12-11 10:18:05,905 - assess_quality - INFO - ==================================================
+2025-12-11 10:18:05,905 - assess_quality - INFO - QUALITY ASSESSMENT SUMMARY
+2025-12-11 10:18:05,906 - assess_quality - INFO - ==================================================
+2025-12-11 10:18:05,906 - assess_quality - INFO - Total images assessed: 30
+2025-12-11 10:18:05,906 - assess_quality - INFO - Passed quality filter: 25
+2025-12-11 10:18:05,906 - assess_quality - INFO - Rejected: 5
+2025-12-11 10:18:05,906 - assess_quality - INFO - 
+2025-12-11 10:18:05,907 - assess_quality - INFO - Quality metrics (overall):
+2025-12-11 10:18:05,907 - assess_quality - INFO -   Mean: 45.9
+2025-12-11 10:18:05,907 - assess_quality - INFO -   Std: 16.7
+2025-12-11 10:18:05,907 - assess_quality - INFO -   Min: 16.0
+2025-12-11 10:18:05,908 - assess_quality - INFO -   Max: 93.6
+2025-12-11 10:18:05,908 - assess_quality - INFO - ==================================================
+2025-12-11 10:18:05,908 - assess_quality - INFO - Saved quality stats to data\test\cache\quality_stats.json

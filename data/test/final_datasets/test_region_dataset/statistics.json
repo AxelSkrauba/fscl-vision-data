@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "total_images": 0,
+    "total_species": 0,
+    "images_per_species_mean": NaN,
+    "quality_overall_mean": 0
+  },
+  "by_species": [],
+  "distribution": {
+    "images_histogram": {
+      "bins": [],
+      "counts": []
+    },
+    "quality_histogram": {
+      "bins": [],
+      "counts": []
+    }
+  }
+}

@@ -1,0 +1,19 @@
+2025-12-11 10:09:42,891 - deduplicate - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:09:42,928 - deduplicate - INFO - Loaded 40 observations
+2025-12-11 10:09:42,928 - deduplicate - INFO - Deduplication parameters: spatial=200m, temporal=3d
+2025-12-11 10:09:42,928 - deduplicate - WARNING - No valid coordinates for species Turdus rufiventris, skipping
+2025-12-11 10:09:42,929 - deduplicate - WARNING - No valid coordinates for species Ramphastos toco, skipping
+2025-12-11 10:09:42,929 - deduplicate - WARNING - No valid coordinates for species Ramphastos toco albogularis, skipping
+2025-12-11 10:09:42,929 - deduplicate - INFO - ==================================================
+DEDUPLICATION SUMMARY
+==================================================
+Total original observations: 40
+Unique individuals identified: 0
+Duplicates removed: 40
+Overall dedup rate: 100.0%
+
+By species:
+------------------------------
+==================================================
+2025-12-11 10:09:42,930 - deduplicate - INFO - Saved 0 deduplicated observations to data\test\cache\observations_deduplicated.json
+2025-12-11 10:09:42,931 - deduplicate - INFO - Saved deduplication stats to data\test\cache\deduplication_stats.json

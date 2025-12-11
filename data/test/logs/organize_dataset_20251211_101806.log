@@ -1,0 +1,24 @@
+2025-12-11 10:18:06,038 - organize_dataset - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:18:06,054 - organize_dataset - INFO - Loaded 19 observations from data\test\cache\observations_selected.json
+2025-12-11 10:18:06,054 - organize_dataset - INFO - Organizing dataset: test_region_-_misiones_ar_dataset
+2025-12-11 10:18:06,054 - organize_dataset - INFO - Output directory: data\test\final_datasets
+2025-12-11 10:18:06,072 - organize_dataset - INFO - Organized Turdus rufiventris: 9 images
+2025-12-11 10:18:06,090 - organize_dataset - INFO - Organized Ramphastos toco: 10 images
+2025-12-11 10:18:06,094 - organize_dataset - INFO - Dataset 'test_region_-_misiones_ar_dataset' organized: 19 images, 2 species
+2025-12-11 10:18:06,095 - organize_dataset - INFO - Validating dataset...
+2025-12-11 10:18:06,097 - organize_dataset - INFO - Validation complete: {'total_species': 2, 'total_images_manifest': 19, 'total_images_checked': 19, 'missing_images': 0}
+2025-12-11 10:18:06,097 - organize_dataset - INFO - ==================================================
+2025-12-11 10:18:06,097 - organize_dataset - INFO - DATASET ORGANIZATION COMPLETE
+2025-12-11 10:18:06,098 - organize_dataset - INFO - ==================================================
+2025-12-11 10:18:06,098 - organize_dataset - INFO - Dataset path: data\test\final_datasets\test_region_-_misiones_ar_dataset
+2025-12-11 10:18:06,098 - organize_dataset - INFO - Total species: 2
+2025-12-11 10:18:06,099 - organize_dataset - INFO - Total images: 19
+2025-12-11 10:18:06,099 - organize_dataset - INFO - Validation: PASSED
+2025-12-11 10:18:06,099 - organize_dataset - INFO - 
+2025-12-11 10:18:06,099 - organize_dataset - INFO - Generated files:
+2025-12-11 10:18:06,100 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\species_manifest.json
+2025-12-11 10:18:06,100 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\dataset_metadata.yaml
+2025-12-11 10:18:06,101 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\statistics.json
+2025-12-11 10:18:06,101 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\README.md
+2025-12-11 10:18:06,101 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\images
+2025-12-11 10:18:06,101 - organize_dataset - INFO - ==================================================

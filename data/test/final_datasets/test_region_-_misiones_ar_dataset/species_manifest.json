@@ -1,0 +1,288 @@
+{
+  "dataset_name": "test_region_-_misiones_ar_dataset",
+  "created_at": "2025-12-11T10:18:06.055921",
+  "total_images": 19,
+  "total_species": 2,
+  "classes": {
+    "12738": {
+      "name": "Turdus rufiventris",
+      "common_name": "Rufous-bellied Thrush",
+      "count": 9,
+      "images": [
+        {
+          "filename": "308301510_556204223.jpg",
+          "observation_id": 308301510,
+          "photo_id": 556204223,
+          "quality_score": 64.16,
+          "observed_date": "2025-08-01",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Nicolás Montaño Rasch, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "303422811_546875895.jpg",
+          "observation_id": 303422811,
+          "photo_id": 546875895,
+          "quality_score": 49.78,
+          "observed_date": "2025-07-31",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Franco montaño, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "290005664_521658435.jpg",
+          "observation_id": 290005664,
+          "photo_id": 521658435,
+          "quality_score": 47.72,
+          "observed_date": "2025-06-15",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 21
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Andrea Talone Rìo, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "292152172_525713224.jpg",
+          "observation_id": 292152172,
+          "photo_id": 525713224,
+          "quality_score": 43.53,
+          "observed_date": "2025-06-19",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 15
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Andrea Talone Rìo, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "305294219_550419114.jpg",
+          "observation_id": 305294219,
+          "photo_id": 550419114,
+          "quality_score": 42.69,
+          "observed_date": "2025-07-27",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Nicolás Montaño Rasch, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "290304884_522073154.jpg",
+          "observation_id": 290304884,
+          "photo_id": 522073154,
+          "quality_score": 42.44,
+          "observed_date": "2025-05-30",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc-sa",
+          "attribution": "(c) Gustavo Fernando Durán, some rights reserved (CC BY-NC-SA)"
+        },
+        {
+          "filename": "296354370_533592150.jpg",
+          "observation_id": 296354370,
+          "photo_id": 533592150,
+          "quality_score": 41.3,
+          "observed_date": "2025-06-04",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc-sa",
+          "attribution": "(c) Gustavo Fernando Durán, some rights reserved (CC BY-NC-SA)"
+        },
+        {
+          "filename": "316764506_573920666.jpg",
+          "observation_id": 316764506,
+          "photo_id": 573920666,
+          "quality_score": 40.3,
+          "observed_date": "2025-09-25",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) lorena teza, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "296494083_533878341.jpg",
+          "observation_id": 296494083,
+          "photo_id": 533878341,
+          "quality_score": 34.3,
+          "observed_date": "2025-07-06",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 4459
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) carmenoviedo, some rights reserved (CC BY-NC)"
+        }
+      ]
+    },
+    "18793": {
+      "name": "Ramphastos toco",
+      "common_name": "Toco Toucan",
+      "count": 10,
+      "images": [
+        {
+          "filename": "326348617_591037157.jpg",
+          "observation_id": 326348617,
+          "photo_id": 591037157,
+          "quality_score": 93.64,
+          "observed_date": "2025-11-13",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 3035
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) axel_14-1, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "323543398_585447120.jpg",
+          "observation_id": 323543398,
+          "photo_id": 585447120,
+          "quality_score": 71.62,
+          "observed_date": "2025-10-24",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 192
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Lara, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "313475697_566099400.jpg",
+          "observation_id": 313475697,
+          "photo_id": 566099400,
+          "quality_score": 69.57,
+          "observed_date": "2025-09-04",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 244
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Adrian Antunez, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "315146461_569283901.jpg",
+          "observation_id": 315146461,
+          "photo_id": 569283901,
+          "quality_score": 61.88,
+          "observed_date": "2025-09-11",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 4
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Adrian Braidotti, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "314259377_567598209.jpg",
+          "observation_id": 314259377,
+          "photo_id": 567598209,
+          "quality_score": 59.07,
+          "observed_date": "2025-09-01",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 488
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Adrian Antunez, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "325421977_589189929.jpg",
+          "observation_id": 325421977,
+          "photo_id": 589189929,
+          "quality_score": 57.0,
+          "observed_date": "2025-11-01",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 684
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) danisergio, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "308253432_556103158.jpg",
+          "observation_id": 308253432,
+          "photo_id": 556103158,
+          "quality_score": 54.62,
+          "observed_date": "2025-08-17",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 354
+          },
+          "license": null,
+          "attribution": "(c) Gustavo Dallaqua, all rights reserved"
+        },
+        {
+          "filename": "313202445_565571528.jpg",
+          "observation_id": 313202445,
+          "photo_id": 565571528,
+          "quality_score": 50.1,
+          "observed_date": "2025-09-03",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 201
+          },
+          "license": "cc-by",
+          "attribution": "(c) Pablo Bombín, some rights reserved (CC BY)"
+        },
+        {
+          "filename": "327521807_593378537.jpg",
+          "observation_id": 327521807,
+          "photo_id": 593378537,
+          "quality_score": 49.96,
+          "observed_date": "2025-11-20",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": 122
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) v0id-png, some rights reserved (CC BY-NC)"
+        },
+        {
+          "filename": "326120127_590585068.jpg",
+          "observation_id": 326120127,
+          "photo_id": 590585068,
+          "quality_score": 45.6,
+          "observed_date": "2025-10-31",
+          "location": {
+            "latitude": null,
+            "longitude": null,
+            "accuracy_m": null
+          },
+          "license": "cc-by-nc",
+          "attribution": "(c) Ute Welk, some rights reserved (CC BY-NC)"
+        }
+      ]
+    }
+  }
+}

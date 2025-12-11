@@ -1,0 +1,13 @@
+2025-12-11 09:58:47,918 - fetch_observations - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 09:58:47,919 - fetch_observations - INFO - Region: Test Region
+2025-12-11 09:58:47,919 - fetch_observations - INFO - Fetching observations for: Nasua nasua (taxon_id=41684, max=20)
+2025-12-11 09:58:50,627 - fetch_observations - INFO -   -> Found 0 observations for Nasua nasua
+2025-12-11 09:58:50,627 - fetch_observations - INFO - Fetching observations for: Ramphastos toco (taxon_id=18266, max=20)
+2025-12-11 09:58:52,047 - fetch_observations - INFO -   -> Found 0 observations for Ramphastos toco
+2025-12-11 09:58:52,047 - fetch_observations - INFO - Saved 0 observations to data\test\cache\observations.json
+2025-12-11 09:58:52,048 - fetch_observations - INFO - ==================================================
+2025-12-11 09:58:52,048 - fetch_observations - INFO - SUMMARY: Observations by species
+2025-12-11 09:58:52,049 - fetch_observations - INFO - ==================================================
+2025-12-11 09:58:52,049 - fetch_observations - INFO - ==================================================
+2025-12-11 09:58:52,049 - fetch_observations - INFO - Total: 0 observations, 0 species
+2025-12-11 09:58:52,050 - fetch_observations - INFO - Cache stats: 0 hits, 2 misses

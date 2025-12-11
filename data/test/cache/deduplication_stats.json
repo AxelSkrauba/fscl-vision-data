@@ -1,0 +1,33 @@
+{
+  "total_original": 40,
+  "total_unique": 31,
+  "duplicates_removed": 9,
+  "dedup_rate": 0.22499999999999998,
+  "by_species": {
+    "12738": {
+      "name": "Turdus rufiventris",
+      "original": 20,
+      "unique": 12,
+      "removed": 8,
+      "dedup_rate": 0.4
+    },
+    "18793": {
+      "name": "Ramphastos toco",
+      "original": 19,
+      "unique": 18,
+      "removed": 1,
+      "dedup_rate": 0.052631578947368474
+    },
+    "711940": {
+      "name": "Ramphastos toco albogularis",
+      "original": 1,
+      "unique": 1,
+      "removed": 0,
+      "dedup_rate": 0.0
+    }
+  },
+  "parameters": {
+    "spatial_threshold_m": 200,
+    "temporal_threshold_days": 3
+  }
+}

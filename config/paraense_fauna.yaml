@@ -1,0 +1,155 @@
+# FSCL-Vision Data Pipeline - Configuracion Selva Paranaense
+# Dataset de fauna silvestre de la Selva Paranaense (Misiones, Argentina)
+
+# Geografia - Selva Paranaense / Atlantic Forest
+geography:
+  region_name: "Selva Paranaense"
+  # Place ID para Misiones, Argentina en iNaturalist
+  # Verificado via API: https://api.inaturalist.org/v1/places/autocomplete?q=Misiones
+  place_id: 10422  # Misiones, AR
+  # Bounding box alternativo (aproximado para la ecorregion)
+  bounds:
+    north: -25.0
+    south: -28.0
+    east: -53.5
+    west: -56.0
+
+# Fauna de interes - Especies emblematicas de la Selva Paranaense
+fauna:
+  taxa:
+    # Grandes felinos
+    - name: "Panthera onca"
+      taxon_id: 41976
+      common_names: ["Jaguar", "Yaguarete"]
+      max_observations: 500
+
+    - name: "Puma concolor"
+      taxon_id: 41975
+      common_names: ["Puma", "Mountain Lion"]
+      max_observations: 500
+
+    # Felinos menores
+    - name: "Leopardus pardalis"
+      taxon_id: 41978
+      common_names: ["Ocelot", "Ocelote"]
+      max_observations: 400
+
+    - name: "Leopardus wiedii"
+      taxon_id: 41979
+      common_names: ["Margay", "Gato tigre"]
+      max_observations: 300
+
+    # Primates
+    - name: "Alouatta caraya"
+      taxon_id: 43550
+      common_names: ["Black Howler Monkey", "Mono aullador negro"]
+      max_observations: 500
+
+    - name: "Sapajus nigritus"
+      taxon_id: 43524
+      common_names: ["Black Capuchin", "Mono cai"]
+      max_observations: 400
+
+    # Tapir
+    - name: "Tapirus terrestris"
+      taxon_id: 42185
+      common_names: ["South American Tapir", "Tapir"]
+      max_observations: 400
+
+    # Pecaries
+    - name: "Pecari tajacu"
+      taxon_id: 42250
+      common_names: ["Collared Peccary", "Pecari de collar"]
+      max_observations: 400
+
+    - name: "Tayassu pecari"
+      taxon_id: 42251
+      common_names: ["White-lipped Peccary", "Pecari labios blancos"]
+      max_observations: 300
+
+    # Ciervos
+    - name: "Mazama americana"
+      taxon_id: 42389
+      common_names: ["Red Brocket", "Corzuela colorada"]
+      max_observations: 400
+
+    - name: "Mazama nana"
+      taxon_id: 42390
+      common_names: ["Brazilian Dwarf Brocket", "Corzuela enana"]
+      max_observations: 300
+
+    # Roedores grandes
+    - name: "Cuniculus paca"
+      taxon_id: 45453
+      common_names: ["Paca", "Paca"]
+      max_observations: 400
+
+    - name: "Dasyprocta azarae"
+      taxon_id: 45429
+      common_names: ["Azara's Agouti", "Aguti"]
+      max_observations: 400
+
+    # Carnivoros menores
+    - name: "Nasua nasua"
+      taxon_id: 41684
+      common_names: ["South American Coati", "Coati"]
+      max_observations: 500
+
+    - name: "Eira barbara"
+      taxon_id: 41631
+      common_names: ["Tayra", "Irar"]
+      max_observations: 300
+
+    # Aves emblematicas
+    - name: "Harpia harpyja"
+      taxon_id: 5303
+      common_names: ["Harpy Eagle", "Aguila arpia"]
+      max_observations: 200
+
+    - name: "Ramphastos toco"
+      taxon_id: 18266
+      common_names: ["Toco Toucan", "Tucan grande"]
+      max_observations: 500
+
+    - name: "Ara chloropterus"
+      taxon_id: 18778
+      common_names: ["Red-and-green Macaw", "Guacamayo rojo"]
+      max_observations: 400
+
+# Calidad de imagenes
+quality:
+  minimum_width: 400
+  minimum_height: 400
+  quality_score_threshold: 40
+  max_blur_detected: 35
+
+# Deduplicacion
+deduplication:
+  spatial_threshold_m: 100
+  temporal_threshold_days: 1
+
+# Seleccion de muestras
+sampling:
+  method: "clustering"
+  samples_per_species: 50
+  min_samples_per_species: 15
+
+# Directorios
+data_dir: "./data"
+cache_dir: "./data/cache"
+raw_dir: "./data/raw"
+output_dir: "./data/final_datasets"
+
+# API
+api:
+  rate_limit_requests_per_minute: 100
+  rate_limit_requests_per_day: 10000
+  max_retries: 3
+  timeout_seconds: 30
+  download_workers: 4
+
+# Logging
+logging:
+  level: "INFO"
+  log_dir: "./data/logs"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

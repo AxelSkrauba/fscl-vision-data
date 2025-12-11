@@ -1,0 +1,82 @@
+{
+  "summary": {
+    "total_images": 19,
+    "total_species": 2,
+    "images_per_species_mean": 9.5,
+    "quality_overall_mean": 53.6459334027161
+  },
+  "by_species": [
+    {
+      "species_id": "12738",
+      "name": "Turdus rufiventris",
+      "common_name": "Rufous-bellied Thrush",
+      "count": 9,
+      "quality_mean": 45.135555555555555,
+      "quality_std": 7.898717351726742
+    },
+    {
+      "species_id": "18793",
+      "name": "Ramphastos toco",
+      "common_name": "Toco Toucan",
+      "count": 10,
+      "quality_mean": 61.306000000000004,
+      "quality_std": 13.378033637272708
+    }
+  ],
+  "distribution": {
+    "images_histogram": {
+      "bins": [
+        9.0,
+        9.1,
+        9.2,
+        9.3,
+        9.4,
+        9.5,
+        9.6,
+        9.7,
+        9.8,
+        9.9,
+        10.0
+      ],
+      "counts": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "quality_histogram": {
+      "bins": [
+        34.297108907899904,
+        40.231045995509874,
+        46.16498308311985,
+        52.09892017072982,
+        58.03285725833979,
+        63.96679434594976,
+        69.90073143355974,
+        75.8346685211697,
+        81.76860560877967,
+        87.70254269638964,
+        93.63647978399962
+      ],
+      "counts": [
+        1,
+        6,
+        4,
+        2,
+        2,
+        2,
+        1,
+        0,
+        0,
+        1
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+2025-12-11 10:08:39,419 - fetch_observations - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:08:39,419 - fetch_observations - INFO - Region: Test Region - Misiones AR
+2025-12-11 10:08:39,420 - fetch_observations - INFO - Fetching observations for: Turdus rufiventris (taxon_id=12738, max=20)
+2025-12-11 10:08:43,206 - fetch_observations - INFO -   -> Found 20 observations for Turdus rufiventris
+2025-12-11 10:08:43,207 - fetch_observations - INFO - Fetching observations for: Ramphastos toco (taxon_id=18793, max=20)
+2025-12-11 10:08:46,130 - fetch_observations - INFO -   -> Found 20 observations for Ramphastos toco
+2025-12-11 10:08:46,305 - fetch_observations - INFO - Saved 40 observations to data\test\cache\observations.json
+2025-12-11 10:08:46,306 - fetch_observations - INFO - ==================================================
+2025-12-11 10:08:46,306 - fetch_observations - INFO - SUMMARY: Observations by species
+2025-12-11 10:08:46,306 - fetch_observations - INFO - ==================================================
+2025-12-11 10:08:46,306 - fetch_observations - INFO -   Turdus rufiventris: 20
+2025-12-11 10:08:46,307 - fetch_observations - INFO -   Ramphastos toco: 19
+2025-12-11 10:08:46,307 - fetch_observations - INFO -   Ramphastos toco albogularis: 1
+2025-12-11 10:08:46,307 - fetch_observations - INFO - ==================================================
+2025-12-11 10:08:46,307 - fetch_observations - INFO - Total: 40 observations, 3 species
+2025-12-11 10:08:46,308 - fetch_observations - INFO - Cache stats: 0 hits, 2 misses

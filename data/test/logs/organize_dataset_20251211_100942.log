@@ -1,0 +1,22 @@
+2025-12-11 10:09:42,960 - organize_dataset - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:09:42,960 - organize_dataset - INFO - Loaded 0 observations from data\test\cache\observations_selected.json
+2025-12-11 10:09:42,961 - organize_dataset - INFO - Organizing dataset: test_region_-_misiones_ar_dataset
+2025-12-11 10:09:42,961 - organize_dataset - INFO - Output directory: data\test\final_datasets
+2025-12-11 10:09:42,966 - organize_dataset - INFO - Dataset 'test_region_-_misiones_ar_dataset' organized: 0 images, 0 species
+2025-12-11 10:09:42,966 - organize_dataset - INFO - Validating dataset...
+2025-12-11 10:09:42,967 - organize_dataset - INFO - Validation complete: {'total_species': 0, 'total_images_manifest': 0, 'total_images_checked': 0, 'missing_images': 0}
+2025-12-11 10:09:42,968 - organize_dataset - INFO - ==================================================
+2025-12-11 10:09:42,968 - organize_dataset - INFO - DATASET ORGANIZATION COMPLETE
+2025-12-11 10:09:42,968 - organize_dataset - INFO - ==================================================
+2025-12-11 10:09:42,968 - organize_dataset - INFO - Dataset path: data\test\final_datasets\test_region_-_misiones_ar_dataset
+2025-12-11 10:09:42,969 - organize_dataset - INFO - Total species: 0
+2025-12-11 10:09:42,969 - organize_dataset - INFO - Total images: 0
+2025-12-11 10:09:42,969 - organize_dataset - INFO - Validation: PASSED
+2025-12-11 10:09:42,969 - organize_dataset - INFO - 
+2025-12-11 10:09:42,969 - organize_dataset - INFO - Generated files:
+2025-12-11 10:09:42,971 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\species_manifest.json
+2025-12-11 10:09:42,971 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\dataset_metadata.yaml
+2025-12-11 10:09:42,971 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\statistics.json
+2025-12-11 10:09:42,971 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\README.md
+2025-12-11 10:09:42,971 - organize_dataset - INFO -   data\test\final_datasets\test_region_-_misiones_ar_dataset\images
+2025-12-11 10:09:42,971 - organize_dataset - INFO - ==================================================

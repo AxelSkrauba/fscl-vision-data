@@ -1,0 +1,20 @@
+2025-12-11 10:18:05,917 - select_samples - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 10:18:05,938 - select_samples - INFO - Loaded 25 observations from data\test\cache\observations_quality.json
+2025-12-11 10:18:05,938 - select_samples - INFO - Selection parameters: method=quality, n=10, min=5
+2025-12-11 10:18:05,939 - select_samples - INFO - Turdus rufiventris: selected 9/9 samples
+2025-12-11 10:18:05,939 - select_samples - INFO - Ramphastos toco: selected 10/15 samples
+2025-12-11 10:18:05,939 - select_samples - WARNING - Species Ramphastos toco albogularis has only 1 samples (min: 5), skipping
+2025-12-11 10:18:06,025 - select_samples - INFO - Saved 19 selected observations to data\test\cache\observations_selected.json
+2025-12-11 10:18:06,027 - select_samples - INFO - ==================================================
+2025-12-11 10:18:06,027 - select_samples - INFO - SAMPLE SELECTION SUMMARY
+2025-12-11 10:18:06,028 - select_samples - INFO - ==================================================
+2025-12-11 10:18:06,028 - select_samples - INFO - Method: quality
+2025-12-11 10:18:06,028 - select_samples - INFO - Total candidates: 25
+2025-12-11 10:18:06,029 - select_samples - INFO - Total selected: 19
+2025-12-11 10:18:06,029 - select_samples - INFO - Species included: 2
+2025-12-11 10:18:06,029 - select_samples - INFO - 
+2025-12-11 10:18:06,030 - select_samples - INFO - By species:
+2025-12-11 10:18:06,030 - select_samples - INFO -   Ramphastos toco: 10
+2025-12-11 10:18:06,030 - select_samples - INFO -   Turdus rufiventris: 9
+2025-12-11 10:18:06,030 - select_samples - INFO - ==================================================
+2025-12-11 10:18:06,031 - select_samples - INFO - Saved selection stats to data\test\cache\selection_stats.json

@@ -1,0 +1,32 @@
+created_at: '2025-12-11T10:18:06.091867'
+data_provenance:
+  pipeline_stages:
+  - fetch_observations
+  - download_images
+  - deduplicate
+  - assess_quality
+  - select_samples
+  - organize_dataset
+  source: iNaturalist
+  total_observations_processed: 19
+description: Wildlife image dataset from Test Region - Misiones AR. Prepared for few-shot
+  classification with FSCL-Vision framework.
+geographic_coverage: {}
+images_per_species:
+  max: 10
+  mean: 9.5
+  min: 9
+  std: 0.5
+name: test_region_-_misiones_ar_dataset
+pipeline_version: 1.0.0
+quality_metrics:
+  max: 93.63647978399962
+  mean: 53.6459334027161
+  min: 34.297108907899904
+  std: 13.745718326052677
+source: iNaturalist
+temporal_coverage:
+  earliest: '2025-05-30'
+  latest: '2025-11-20'
+total_images: 19
+total_species: 2

@@ -1,0 +1,17 @@
+2025-12-11 09:58:53,191 - select_samples - INFO - Configuration loaded from config/test_config.yaml
+2025-12-11 09:58:53,192 - select_samples - WARNING - Quality file not found: data\test\cache\observations_quality.json
+2025-12-11 09:58:53,192 - select_samples - WARNING - Falling back to deduplicated observations
+2025-12-11 09:58:53,193 - select_samples - INFO - Loaded 0 observations from data\test\cache\observations_deduplicated.json
+2025-12-11 09:58:53,193 - select_samples - INFO - Selection parameters: method=quality, n=10, min=5
+2025-12-11 09:58:53,194 - select_samples - INFO - Saved 0 selected observations to data\test\cache\observations_selected.json
+2025-12-11 09:58:53,195 - select_samples - INFO - ==================================================
+2025-12-11 09:58:53,195 - select_samples - INFO - SAMPLE SELECTION SUMMARY
+2025-12-11 09:58:53,195 - select_samples - INFO - ==================================================
+2025-12-11 09:58:53,196 - select_samples - INFO - Method: quality
+2025-12-11 09:58:53,196 - select_samples - INFO - Total candidates: 0
+2025-12-11 09:58:53,196 - select_samples - INFO - Total selected: 0
+2025-12-11 09:58:53,197 - select_samples - INFO - Species included: 0
+2025-12-11 09:58:53,197 - select_samples - INFO - 
+2025-12-11 09:58:53,197 - select_samples - INFO - By species:
+2025-12-11 09:58:53,198 - select_samples - INFO - ==================================================
+2025-12-11 09:58:53,198 - select_samples - INFO - Saved selection stats to data\test\cache\selection_stats.json

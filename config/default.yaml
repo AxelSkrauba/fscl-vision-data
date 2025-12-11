@@ -1,0 +1,75 @@
+# FSCL-Vision Data Pipeline - Default Configuration
+# Este archivo contiene valores por defecto para todas las opciones.
+# Copiar y modificar para crear configuraciones especificas.
+
+# Geografia - Region de interes
+geography:
+  region_name: "Default Region"
+  # place_id: ID de lugar en iNaturalist (ver https://www.inaturalist.org/places)
+  # Si se especifica place_id, se ignora bounds
+  place_id: null
+  # Bounding box alternativo (si no hay place_id)
+  bounds:
+    north: 0.0
+    south: 0.0
+    east: 0.0
+    west: 0.0
+
+# Fauna de interes
+fauna:
+  # Lista de taxa a obtener
+  # Cada entrada puede tener:
+  #   - name: Nombre cientifico o comun
+  #   - taxon_id: ID de taxon en iNaturalist
+  #   - common_names: Lista de nombres comunes (opcional)
+  #   - max_observations: Maximo de observaciones a obtener
+  taxa: []
+
+# Calidad de imagenes
+quality:
+  # Dimensiones minimas en pixeles
+  minimum_width: 400
+  minimum_height: 400
+  # Score minimo de calidad (0-100)
+  quality_score_threshold: 40
+  # Maximo blur permitido (0-100, menor = mas estricto)
+  max_blur_detected: 30
+
+# Deduplicacion
+deduplication:
+  # Distancia maxima en metros para considerar mismo individuo
+  spatial_threshold_m: 100
+  # Dias maximos entre observaciones para agrupar
+  temporal_threshold_days: 1
+
+# Seleccion de muestras
+sampling:
+  # Metodo: 'clustering', 'stratified', 'quality', 'random'
+  method: "clustering"
+  # Numero objetivo de muestras por especie
+  samples_per_species: 50
+  # Minimo de muestras para incluir una especie
+  min_samples_per_species: 10
+
+# Directorios de datos
+data_dir: "./data"
+cache_dir: "./data/cache"
+raw_dir: "./data/raw"
+output_dir: "./data/final_datasets"
+
+# Configuracion de API
+api:
+  # Rate limiting
+  rate_limit_requests_per_minute: 100
+  rate_limit_requests_per_day: 10000
+  # Reintentos y timeout
+  max_retries: 3
+  timeout_seconds: 30
+  # Workers para descarga paralela
+  download_workers: 4
+
+# Logging
+logging:
+  level: "INFO"
+  log_dir: "./data/logs"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
