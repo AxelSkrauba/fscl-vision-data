@@ -72,6 +72,15 @@ class DatasetOrganizer:
         self.source_dir = Path(source_dir) if source_dir else None
         self.logger = logger or logging.getLogger(__name__)
     
+    def _safe_float(self, value, default: float = 50.0) -> float:
+        """Convierte un valor a float de forma segura."""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+    
     def organize_dataset(
         self,
         observations: List[Dict[str, Any]],
@@ -159,7 +168,7 @@ class DatasetOrganizer:
                 photo = photos[0]
                 obs_id = obs.get('id', 'unknown')
                 photo_id = photo.get('id', 0)
-                quality_score = obs.get('quality_score', 50)
+                quality_score = self._safe_float(obs.get('quality_score', 50))
                 
                 filename = f"{obs_id}_{photo_id}.jpg"
                 
@@ -197,10 +206,10 @@ class DatasetOrganizer:
                 all_quality_scores.append(quality_score)
                 if obs.get('observed_on'):
                     all_dates.append(obs['observed_on'])
-                if obs.get('latitude'):
-                    all_lats.append(obs['latitude'])
-                if obs.get('longitude'):
-                    all_lons.append(obs['longitude'])
+                if obs.get('latitude') is not None:
+                    all_lats.append(self._safe_float(obs['latitude'], 0))
+                if obs.get('longitude') is not None:
+                    all_lons.append(self._safe_float(obs['longitude'], 0))
             
             self.logger.info(
                 f"Organized {species_name}: {len(species_obs)} images"
@@ -485,7 +494,7 @@ If you use this dataset, please cite:
             return validation
         
         try:
-            with open(manifest_path) as f:
+            with open(manifest_path, encoding='utf-8') as f:
                 manifest = json.load(f)
         except json.JSONDecodeError as e:
             validation['valid'] = False

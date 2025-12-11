@@ -189,7 +189,7 @@ class RepresentativeSampleSelector:
         if len(selected) < n_samples:
             remaining = [obs for obs in observations if obs not in selected]
             remaining.sort(
-                key=lambda o: o.get('quality_score', 50),
+                key=lambda o: self._get_quality_score(o),
                 reverse=True
             )
             selected.extend(remaining[:n_samples - len(selected)])
@@ -240,7 +240,7 @@ class RepresentativeSampleSelector:
         
         for stratum_obs in strata.values():
             stratum_obs.sort(
-                key=lambda o: o.get('quality_score', 50),
+                key=lambda o: self._get_quality_score(o),
                 reverse=True
             )
             selected.extend(stratum_obs[:samples_per_stratum])
@@ -248,7 +248,7 @@ class RepresentativeSampleSelector:
         if len(selected) < n_samples:
             remaining = [obs for obs in observations if obs not in selected]
             remaining.sort(
-                key=lambda o: o.get('quality_score', 50),
+                key=lambda o: self._get_quality_score(o),
                 reverse=True
             )
             selected.extend(remaining[:n_samples - len(selected)])
@@ -263,10 +263,20 @@ class RepresentativeSampleSelector:
         """Selecciona las N observaciones de mayor calidad."""
         sorted_obs = sorted(
             observations,
-            key=lambda o: o.get('quality_score', 50),
+            key=lambda o: self._get_quality_score(o),
             reverse=True
         )
         return sorted_obs[:n_samples]
+    
+    def _get_quality_score(self, obs: Dict[str, Any]) -> float:
+        """Obtiene el quality_score como float, manejando tipos mixtos."""
+        score = obs.get('quality_score', 50)
+        if score is None:
+            return 50.0
+        try:
+            return float(score)
+        except (ValueError, TypeError):
+            return 50.0
     
     def _select_random(
         self,
@@ -308,7 +318,7 @@ class RepresentativeSampleSelector:
             observed_on = obs.get('observed_on', '')
             day_of_year = self._date_to_day_of_year(observed_on)
             
-            quality = obs.get('quality_score', 50)
+            quality = self._get_quality_score(obs)
             
             features.append([
                 float(lat),
@@ -333,7 +343,7 @@ class RepresentativeSampleSelector:
         
         best_obs = max(
             cluster_obs,
-            key=lambda o: o.get('quality_score', 50)
+            key=lambda o: self._get_quality_score(o)
         )
         return best_obs
     
