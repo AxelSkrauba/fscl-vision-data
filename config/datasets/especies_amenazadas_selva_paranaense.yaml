@@ -1,0 +1,257 @@
+# =============================================================================
+# Dataset: Especies Amenazadas de la Selva Paranaense
+# =============================================================================
+# Dataset especializado en especies con algún grado de amenaza según IUCN
+# presentes en la Selva Paranaense. Incluye especies CR, EN, VU y NT.
+#
+# Aplicaciones:
+#   - Detección temprana de especies amenazadas
+#   - Monitoreo de poblaciones en riesgo
+#   - Sistemas de alerta para conservación
+#   - Benchmarking de clasificadores con clases desbalanceadas
+#
+# Consideraciones:
+#   - Dataset inherentemente desbalanceado
+#   - Algunas especies con muy pocas observaciones
+#   - Ideal para evaluación de few-shot learning en escenarios reales
+#
+# Generado: 2025-12-12
+# =============================================================================
+
+dataset:
+  name: "especies_amenazadas_selva_paranaense"
+  version: "1.0"
+  description: "Dataset de especies amenazadas de la Selva Paranaense"
+  target_task: "multi-class classification / detection"
+  notes: "Dataset desbalanceado - refleja distribución real de observaciones"
+
+geography:
+  region_name: "Selva Paranaense - Misiones, Argentina"
+  place_id: 10422
+  country: "Argentina"
+  province: "Misiones"
+
+api:
+  quality_grade: "research"
+  rate_limit_calls: 60
+  rate_limit_period: 60
+
+quality:
+  minimum_width: 300  # Umbral más bajo para maximizar datos de especies raras
+  minimum_height: 300
+  quality_score_threshold: 30
+
+deduplication:
+  spatial_threshold_m: 200
+  temporal_threshold_days: 3
+
+sampling:
+  method: "quality"
+  n_samples_per_species: 50
+  min_samples_per_species: 3  # Umbral bajo para incluir especies raras
+  balance_dataset: false  # Mantener distribución natural
+
+fauna:
+  taxa:
+    # === EN PELIGRO CRÍTICO (CR) ===
+    - name: "Panthera onca"
+      taxon_id: 41944
+      common_names: ["Yaguareté", "Jaguar"]
+      max_observations: 30
+      conservation_status: "CR"
+      iucn_category: "Critically Endangered"
+      notes: "Menos de 100 individuos en Argentina"
+
+    # === EN PELIGRO (EN) ===
+    - name: "Pipile jacutinga"
+      taxon_id: 2109
+      common_names: ["Yacutinga", "Black-fronted Piping-Guan"]
+      max_observations: 250
+      conservation_status: "EN"
+      iucn_category: "Endangered"
+
+    - name: "Sylvilagus brasiliensis"
+      taxon_id: 43107
+      common_names: ["Tapetí", "Common Tapeti"]
+      max_observations: 60
+      conservation_status: "EN"
+      iucn_category: "Endangered"
+
+    - name: "Spizaetus ornatus"
+      taxon_id: 5294
+      common_names: ["Águila crestuda real", "Ornate Hawk-Eagle"]
+      max_observations: 20
+      conservation_status: "EN"
+      iucn_category: "Endangered"
+
+    - name: "Steindachneridion melanodermatum"
+      taxon_id: 619252
+      common_names: ["Surubí del Iguazú", "Iguazu Catfish"]
+      max_observations: 150
+      conservation_status: "EN"
+      iucn_category: "Endangered"
+      notes: "Pez endémico - incluido por relevancia regional"
+
+    # === VULNERABLE (VU) ===
+    - name: "Sapajus nigritus"
+      taxon_id: 410834
+      common_names: ["Mono caí negro", "Black Capuchin"]
+      max_observations: 500
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Phrynops williamsi"
+      taxon_id: 39619
+      common_names: ["Tortuga de arroyo de Williams", "Williams' Side-necked Turtle"]
+      max_observations: 220
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Tapirus terrestris"
+      taxon_id: 43353
+      common_names: ["Tapir", "South American Tapir"]
+      max_observations: 100
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Gubernetes yetapa"
+      taxon_id: 17347
+      common_names: ["Yetapá de collar", "Streamer-tailed Tyrant"]
+      max_observations: 100
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Penelope superciliaris"
+      taxon_id: 2061
+      common_names: ["Pava de monte común", "Rusty-margined Guan"]
+      max_observations: 80
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Amazona vinacea"
+      taxon_id: 18986
+      common_names: ["Loro vinoso", "Vinaceous-breasted Amazon"]
+      max_observations: 70
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+      notes: "Especie endémica del Bosque Atlántico"
+
+    - name: "Notharchus swainsoni"
+      taxon_id: 18262
+      common_names: ["Chacurú grande", "Buff-bellied Puffbird"]
+      max_observations: 55
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Alouatta caraya"
+      taxon_id: 43435
+      common_names: ["Mono aullador negro", "Black-and-gold Howler Monkey"]
+      max_observations: 50
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Manacus manacus"
+      taxon_id: 14235
+      common_names: ["Bailarín blanco", "White-bearded Manakin"]
+      max_observations: 45
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Selenidera maculirostris"
+      taxon_id: 18513
+      common_names: ["Arasarí chico", "Spot-billed Toucanet"]
+      max_observations: 40
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Sporophila pileata"
+      taxon_id: 201230
+      common_names: ["Corbatita picudo", "Pearly-bellied Seedeater"]
+      max_observations: 40
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Brotogeris chiriri"
+      taxon_id: 19215
+      common_names: ["Catita chirirí", "Yellow-chevroned Parakeet"]
+      max_observations: 35
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Leopardus pardalis"
+      taxon_id: 41997
+      common_names: ["Ocelote", "Ocelot"]
+      max_observations: 35
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Strix virgata"
+      taxon_id: 72674
+      common_names: ["Lechuza estriada", "Mottled Owl"]
+      max_observations: 25
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    - name: "Strix hylophila"
+      taxon_id: 19964
+      common_names: ["Lechuza listada", "Rusty-barred Owl"]
+      max_observations: 25
+      conservation_status: "VU"
+      iucn_category: "Vulnerable"
+
+    # === CASI AMENAZADO (NT) ===
+    - name: "Dasyprocta azarae"
+      taxon_id: 43721
+      common_names: ["Agutí", "Azara's Agouti"]
+      max_observations: 300
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Pogonotriccus eximius"
+      taxon_id: 1440090
+      common_names: ["Mosqueta ojo dorado", "Southern Bristle-Tyrant"]
+      max_observations: 35
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Puma concolor"
+      taxon_id: 42007
+      common_names: ["Puma", "Mountain Lion"]
+      max_observations: 30
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Spizaetus melanoleucus"
+      taxon_id: 5282
+      common_names: ["Águila viuda", "Black-and-white Hawk-Eagle"]
+      max_observations: 30
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Amazona aestiva"
+      taxon_id: 18978
+      common_names: ["Loro hablador", "Turquoise-fronted Amazon"]
+      max_observations: 60
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Eira barbara"
+      taxon_id: 41774
+      common_names: ["Irará", "Tayra"]
+      max_observations: 20
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Lontra longicaudis"
+      taxon_id: 41778
+      common_names: ["Lobito de río", "Neotropical River Otter"]
+      max_observations: 20
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"
+
+    - name: "Celeus galeatus"
+      taxon_id: 513600
+      common_names: ["Carpintero cara canela", "Helmeted Woodpecker"]
+      max_observations: 15
+      conservation_status: "NT"
+      iucn_category: "Near Threatened"

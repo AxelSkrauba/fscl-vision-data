@@ -71,6 +71,7 @@ class DatasetOrganizer:
         """
         self.source_dir = Path(source_dir) if source_dir else None
         self.logger = logger or logging.getLogger(__name__)
+        self.config = {}
     
     def _safe_float(self, value, default: float = 50.0) -> float:
         """Convierte un valor a float de forma segura."""
@@ -89,7 +90,8 @@ class DatasetOrganizer:
         description: str = "",
         copy_images: bool = True,
         n_classes: Optional[int] = None,
-        min_images_per_class: int = 10
+        min_images_per_class: int = 10,
+        config: Optional[Dict[str, Any]] = None
     ) -> Path:
         """
         Organiza el dataset final.
@@ -102,10 +104,12 @@ class DatasetOrganizer:
             copy_images: Si copiar imagenes (False = solo crear manifest)
             n_classes: Limitar a N clases con mas imagenes
             min_images_per_class: Minimo de imagenes para incluir clase
+            config: Configuracion original del YAML para enriquecer metadata
         
         Returns:
             Path al directorio del dataset creado
         """
+        self.config = config or {}
         output_dir = Path(output_dir)
         dataset_path = output_dir / dataset_name
         images_path = dataset_path / 'images'
@@ -398,18 +402,72 @@ class DatasetOrganizer:
             for cls in manifest['classes'].values()
         ])
         
+        # Extraer información del config si está disponible
+        dataset_cfg = self.config.get('dataset', {})
+        geography_cfg = self.config.get('geography', {})
+        quality_cfg = self.config.get('quality', {})
+        sampling_cfg = self.config.get('sampling', {})
+        
+        # Construir sección de información geográfica
+        geography_section = ""
+        if geography_cfg:
+            geography_items = []
+            if geography_cfg.get('region_name'):
+                geography_items.append(f"- **Region**: {geography_cfg['region_name']}")
+            if geography_cfg.get('country'):
+                geography_items.append(f"- **Country**: {geography_cfg['country']}")
+            if geography_cfg.get('province'):
+                geography_items.append(f"- **Province/State**: {geography_cfg['province']}")
+            if geography_cfg.get('place_id'):
+                geography_items.append(f"- **iNaturalist Place ID**: {geography_cfg['place_id']}")
+            if geography_items:
+                geography_section = "\n## Geographic Coverage\n\n" + "\n".join(geography_items) + "\n"
+        
+        # Construir sección de configuración del pipeline
+        pipeline_section = ""
+        pipeline_items = []
+        if quality_cfg:
+            if quality_cfg.get('minimum_width'):
+                pipeline_items.append(f"- **Minimum Image Size**: {quality_cfg.get('minimum_width')}x{quality_cfg.get('minimum_height', quality_cfg.get('minimum_width'))} px")
+            if quality_cfg.get('quality_score_threshold'):
+                pipeline_items.append(f"- **Quality Score Threshold**: {quality_cfg['quality_score_threshold']}")
+        if sampling_cfg:
+            if sampling_cfg.get('method'):
+                pipeline_items.append(f"- **Sampling Method**: {sampling_cfg['method']}")
+            if sampling_cfg.get('n_samples_per_species'):
+                pipeline_items.append(f"- **Max Samples per Species**: {sampling_cfg['n_samples_per_species']}")
+            if sampling_cfg.get('min_samples_per_species'):
+                pipeline_items.append(f"- **Min Samples per Species**: {sampling_cfg['min_samples_per_species']}")
+        if pipeline_items:
+            pipeline_section = "\n## Pipeline Configuration\n\n" + "\n".join(pipeline_items) + "\n"
+        
+        # Notas adicionales del dataset
+        notes_section = ""
+        if dataset_cfg.get('notes'):
+            notes_section = f"\n> **Note**: {dataset_cfg['notes']}\n"
+        
+        # Target task
+        target_task = ""
+        if dataset_cfg.get('target_task'):
+            target_task = f"- **Target Task**: {dataset_cfg['target_task']}\n"
+        
+        # Version
+        version_info = ""
+        if dataset_cfg.get('version'):
+            version_info = f"- **Version**: {dataset_cfg['version']}\n"
+        
         readme = f"""# {dataset_name}
 
 {description or 'Wildlife image dataset for few-shot classification.'}
-
+{notes_section}
 ## Overview
 
 - **Total Images**: {manifest['total_images']}
 - **Total Species**: {manifest['total_species']}
-- **Source**: iNaturalist
+{target_task}{version_info}- **Source**: iNaturalist
 - **Created**: {metadata.created_at}
 - **Pipeline Version**: {metadata.pipeline_version}
-
+{geography_section}{pipeline_section}
 ## Species Included
 
 {species_list}

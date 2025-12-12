@@ -25,38 +25,50 @@ pip install -r requirements.txt
 
 ## Uso Rápido
 
-### Opción 1: Pipeline completo automatizado
+### Ejemplo: Dataset de Especies Amenazadas
+
+El repositorio incluye un ejemplo completo de configuración para generar un dataset de especies amenazadas de la Selva Paranaense:
 
 ```bash
-python scripts/helpers/run_full_pipeline.py --config config/paraense_fauna.yaml
+# Ejecutar pipeline completo con el ejemplo incluido
+python scripts/helpers/run_full_pipeline.py --config config/datasets/especies_amenazadas_selva_paranaense.yaml
 ```
 
-### Opción 2: Ejecución por etapas
+**Resultado esperado:**
+- ~850 imágenes de ~29 especies amenazadas
+- Dataset organizado en `data/final_datasets/especies_amenazadas_selva_paranaense/`
+- Incluye manifests, metadatos y README generado automáticamente
+
+
+### Crear tu Propio Dataset
 
 ```bash
-# 1. Configurar tu dataset
-cp config/paraense_fauna.yaml config/my_dataset.yaml
-# Editar según tu región y especies de interés
+# 1. Copiar configuración de ejemplo
+cp config/datasets/especies_amenazadas_selva_paranaense.yaml config/datasets/mi_dataset.yaml
 
-# 2. Ejecutar cada etapa del pipeline
-python scripts/01_fetch_observations.py --config config/my_dataset.yaml
-python scripts/02_download_images.py --config config/my_dataset.yaml
-python scripts/03_deduplicate.py --config config/my_dataset.yaml
-python scripts/04_assess_quality.py --config config/my_dataset.yaml
-python scripts/05_select_samples.py --config config/my_dataset.yaml
-python scripts/06_organize_dataset.py --config config/my_dataset.yaml
+# 2. Editar según región y especies de interés
+# - Cambiar place_id para la región de interés (buscar en iNaturalist)
+# - Modificar lista de especies con taxon_id verificados
+# - Ajustar parámetros de calidad y muestreo
 
-# 3. Validar dataset generado
-python scripts/helpers/validate_dataset.py --dataset data/final_datasets/my_dataset/
+# 3. Ejecutar pipeline
+python scripts/helpers/run_full_pipeline.py --config config/datasets/mi_dataset.yaml
 ```
 
-### Prueba rápida
+### Ejecución por Etapas
 
-Para verificar que el pipeline funciona correctamente:
+Para mayor control, ejecutar cada etapa individualmente:
 
 ```bash
-python scripts/helpers/run_full_pipeline.py --config config/test_config.yaml
+python scripts/01_fetch_observations.py --config config/datasets/mi_dataset.yaml
+python scripts/02_download_images.py --config config/datasets/mi_dataset.yaml
+python scripts/03_deduplicate.py --config config/datasets/mi_dataset.yaml
+python scripts/04_assess_quality.py --config config/datasets/mi_dataset.yaml
+python scripts/05_select_samples.py --config config/datasets/mi_dataset.yaml
+python scripts/06_organize_dataset.py --config config/datasets/mi_dataset.yaml
 ```
+
+> **Nota**: El pipeline soporta continuación desde caché. Si una ejecución falla, al re-ejecutar continuará desde la última etapa completada.
 
 ## Estructura del Proyecto
 
@@ -65,7 +77,10 @@ fscl-vision-data/
 ├── config/                     # Archivos de configuración YAML
 │   ├── default.yaml            # Configuración base
 │   ├── paraense_fauna.yaml     # Fauna de la Selva Paranaense
-│   └── test_config.yaml        # Configuración para pruebas rápidas
+│   ├── test_config.yaml        # Configuración para pruebas rápidas
+│   └── datasets/               # Configuraciones de datasets específicos
+│       ├── especies_amenazadas_selva_paranaense.yaml  # Ejemplo principal
+│       └── ...
 ├── src/                        # Código fuente
 │   ├── api_client.py           # Cliente iNaturalist API
 │   ├── image_downloader.py     # Descarga paralela de imágenes
@@ -106,35 +121,78 @@ Para información detallada sobre cada componente del pipeline, consultar:
 
 ## Configuración
 
-Ver `config/paraense_fauna.yaml` para un ejemplo completo de configuración.
+Ver [`config/datasets/especies_amenazadas_selva_paranaense.yaml`](config/datasets/especies_amenazadas_selva_paranaense.yaml) para un ejemplo completo y documentado.
 
-Parámetros principales:
+### Estructura del Archivo YAML
+
+```yaml
+dataset:
+  name: "mi_dataset"                    # Nombre del dataset (usado para directorio y manifests)
+  version: "1.0"
+  description: "Descripción del dataset"
+  target_task: "multi-class classification"
+  notes: "Notas adicionales"
+
+geography:
+  region_name: "Mi Región"
+  place_id: 12345                        # ID de lugar en iNaturalist
+  country: "País"
+
+quality:
+  minimum_width: 300
+  minimum_height: 300
+  quality_score_threshold: 30
+
+sampling:
+  method: "quality"                      # quality, clustering, stratified
+  n_samples_per_species: 50
+  min_samples_per_species: 3
+
+fauna:
+  taxa:
+    - name: "Panthera onca"
+      taxon_id: 41944                    # Verificar en iNaturalist
+      common_names: ["Jaguar"]
+      max_observations: 30
+```
+
+### Parámetros Principales
 
 | Sección | Descripción |
 |---------|-------------|
-| `geography` | Región geográfica (`place_id` de iNaturalist o bounding box) |
+| `dataset` | Nombre, versión y descripción del dataset |
+| `geography` | Región geográfica (`place_id` de iNaturalist) |
 | `fauna.taxa` | Lista de especies con `taxon_id` verificados |
 | `quality` | Umbrales de calidad de imagen (dimensiones mínimas, score) |
 | `deduplication` | Parámetros de clustering espacio-temporal |
 | `sampling` | Método de selección y cantidad de muestras por especie |
 
-**Nota**: Los `taxon_id` y `place_id` deben verificarse en la API de iNaturalist antes de usar.
+> **Importante**: Los `taxon_id` y `place_id` deben verificarse en [iNaturalist](https://www.inaturalist.org/) antes de usar.
 
 ## Salida
 
 El pipeline genera un dataset estructurado con:
 
 ```
-final_datasets/my_dataset/
+final_datasets/especies_amenazadas_selva_paranaense/
 ├── species_manifest.json       # Índice de todas las imágenes por especie
 ├── dataset_metadata.yaml       # Estadísticas y proveniencia de datos
 ├── statistics.json             # Métricas detalladas del dataset
 ├── README.md                   # Documentación del dataset generado
 └── images/
-    └── {species_name}/         # Imágenes organizadas por especie
-        ├── {observation_id}.jpg
-        └── {observation_id}.json  # Metadatos de cada imagen
+    └── {taxon_id}/             # Imágenes organizadas por especie
+        ├── {obs_id}_{photo_id}.jpg
+        └── {obs_id}_{photo_id}.json  # Metadatos de cada imagen
 ```
+
+### Ejemplo de README Generado
+
+El README del dataset incluye automáticamente:
+- Descripción y notas del YAML original
+- Cobertura geográfica (región, país, provincia)
+- Configuración del pipeline (calidad, muestreo)
+- Lista de especies con cantidad de imágenes
+- Instrucciones de uso y carga del dataset
 
 ## Tests
 

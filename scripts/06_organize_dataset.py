@@ -72,11 +72,16 @@ def main(
     
     logger.info(f"Loaded {len(observations)} observations from {selected_file}")
     
-    region_name = config.get('geography', {}).get('region_name', 'wildlife')
-    name = dataset_name or f"{region_name.lower().replace(' ', '_')}_dataset"
+    # Usar dataset.name si está disponible, sino region_name como fallback
+    dataset_config = config.get('dataset', {})
+    geography_config = config.get('geography', {})
     
-    description = (
-        f"Wildlife image dataset from {region_name}. "
+    name = dataset_name or dataset_config.get('name') or \
+           f"{geography_config.get('region_name', 'wildlife').lower().replace(' ', '_')}_dataset"
+    
+    # Usar dataset.description si está disponible
+    description = dataset_config.get('description') or (
+        f"Wildlife image dataset from {geography_config.get('region_name', 'unknown region')}. "
         f"Prepared for few-shot classification with FSCL-Vision framework."
     )
     
@@ -95,7 +100,8 @@ def main(
         description=description,
         copy_images=True,
         n_classes=n_classes,
-        min_images_per_class=config.get('sampling', {}).get('min_samples_per_species', 10)
+        min_images_per_class=config.get('sampling', {}).get('min_samples_per_species', 10),
+        config=config
     )
     
     logger.info("Validating dataset...")
