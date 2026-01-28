@@ -11,6 +11,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+import time
 
 import yaml
 
@@ -55,12 +56,17 @@ def main(config_path: str, max_per_taxon: int = None):
     
     all_observations = []
     geography = config.get('geography', {})
+
     place_id = geography.get('place_id')
-    
+    if place_id: logger.info("Using Geo Filter: Place ID")
     bounds = geography.get('bounds')
     geo_bbox = None
+
+    # Orden: nelat (North), nelng (East), swlat (South), swlng (West)
+
     if bounds and not place_id:
-        geo_bbox = f"{bounds['south']},{bounds['west']},{bounds['north']},{bounds['east']}"
+        geo_bbox = f"{bounds['north']},{bounds['east']},{bounds['south']},{bounds['west']}"
+        logger.info("Using Geo Filter: Bounding Box")
     
     taxa = config.get('fauna', {}).get('taxa', [])
     
@@ -79,15 +85,23 @@ def main(config_path: str, max_per_taxon: int = None):
             obs = client.search_observations(
                 place_id=place_id,
                 geo=geo_bbox,
-                taxon_id=taxon_id,
-                quality_grade='research',
-                has_photos=True,
-                max_results=max_obs,
-                per_page=200
+                taxon_id = taxon_id,
+                quality_grade ='research',
+                has_photos = True,
+                max_results = max_obs,
+                per_page = 200
             )
-            
+    
             logger.info(f"  -> Found {len(obs)} observations for {taxon_name}")
+
+            # Sanity Check de ID
+            if obs:
+                first_id = obs[0].get('taxon', {}).get('id')
+                if str(first_id) != str(taxon_id):
+                    logger.debug(f"   (Taxon mismatch note: Requested {taxon_id}, got {first_id} - usually subspecies)")
+
             all_observations.extend(obs)
+            time.sleep(0.5)
         
         except Exception as e:
             logger.error(f"  -> Error fetching {taxon_name}: {e}")

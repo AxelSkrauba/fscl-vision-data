@@ -199,8 +199,18 @@ class iNaturalistAPIClient:
             
             if place_id is not None:
                 params['place_id'] = place_id
-            if geo is not None:
-                params['geo'] = geo
+            elif geo is not None:
+                try:
+                    parts = geo.split(',')
+                    if len(parts) == 4:
+                        # Orden: nelat (North), nelng (East), swlat (South), swlng (West)
+                        params['nelat'], params['nelng'] = parts[0], parts[1]
+                        params['swlat'], params['swlng'] = parts[2], parts[3]
+                    else:
+                        self.logger.warning(f"Invalid geo format: {geo}. Expected 4 coordinates.")
+                except Exception:
+                    self.logger.warning(f"Error parsing geo: {geo}")        
+                        
             if taxon_id is not None:
                 params['taxon_id'] = taxon_id
             if taxon_name is not None:
