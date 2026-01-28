@@ -611,10 +611,11 @@ class DatasetOrganizer:
             if geography_cfg.get('place_id'):
                 geography_items.append(f"- **iNaturalist Place ID**: {geography_cfg['place_id']}")
             if geography_cfg.get('bounds'):
-                geography_items.append(f"- **Bounding Box**: South ({geography_cfg['bounds']['south']})," 
-                                       f" West ({geography_cfg['bounds']['west']}),"
-                                       f" North ({geography_cfg['bounds']['north']}),"
-                                       f" East ({geography_cfg['bounds']['east']})")
+                b = geography_cfg.get('bounds')
+                geography_items.append(f"- **Bounding Box**: South ({b.get('south')})," 
+                                       f" West ({b.get('west')}),"
+                                       f" North ({b.get('north')}),"
+                                       f" East ({b.get('east')})")
             if geography_items:
                 geography_section = "\n## Geographic Coverage\n\n" + "\n".join(geography_items) + "\n"
         
@@ -705,11 +706,24 @@ with open(dataset_path / "species_manifest.json") as f:
 
 # Iterate over species
 for species_id, species_data in manifest["classes"].items():
-    print(f"{{species_data['name']}}: {{species_data['count']}} images")
+    name = species_data['name']
+    count = species_data['count']
+
+    # Retrieve taxonomic info to build the path
+    family = species_data.get('family', 'Unknown_Family')
+    genus = species_data.get('genus', 'Unknown_Genus')
+    
+    print(f"Loading {{name}} (Taxonomy: {{family}} > {{genus}})... {{count}} images")
     
     for img in species_data["images"]:
-        img_path = dataset_path / "images" / species_id / img["filename"]
-        # Load and process image...
+        # Construct path: images/Family/Genus/Species/filename
+        img_path = dataset_path / "images" / family / genus / species_id / img["filename"]
+        
+        if img_path.exists():
+            # Load and process image...
+            pass
+        else:
+            print(f"Warning: Image not found at {{img_path}}")
 ```
 
 ## License & Attribution
