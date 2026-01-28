@@ -1,13 +1,15 @@
 """
 Organizador de dataset final para FSCL-Vision.
 
-Organiza imagenes seleccionadas en estructura estandar con
+Organiza imagenes seleccionadas en estructura jerárquica (Familia/Género/Especie) con
 manifests y metadata para reproducibilidad.
 """
 
 import json
 import shutil
 import logging
+import requests
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from datetime import datetime
@@ -40,13 +42,17 @@ class DatasetOrganizer:
     """
     Organiza imagenes seleccionadas en estructura final para FSCL-Vision.
     
-    Estructura de salida:
+    Estructura de salida jerárquica:
     ```
     {dataset_name}/
     ├── images/
-    │   ├── {species_id}/
-    │   │   ├── {obs_id}_{photo_id}.jpg
-    │   │   └── {obs_id}_{photo_id}.json
+    │   ├── {Family}/
+    │   │   ├── {Genus}/
+    │   │   │   ├── {Species_Scientific_Name}/
+    │   │   │   │   ├── {obs_id}_{photo_id}.jpg
+    │   │   │   │   └── {obs_id}_{photo_id}.json 
+    │   │   │   └── ...
+    │   │   └── ...             
     │   └── ...
     ├── species_manifest.json
     ├── dataset_metadata.yaml
@@ -55,7 +61,7 @@ class DatasetOrganizer:
     ```
     """
     
-    PIPELINE_VERSION = "1.0.0"
+    PIPELINE_VERSION = "1.1.0-hierarchical"
     
     def __init__(
         self,
@@ -72,15 +78,105 @@ class DatasetOrganizer:
         self.source_dir = Path(source_dir) if source_dir else None
         self.logger = logger or logging.getLogger(__name__)
         self.config = {}
+        self.taxonomy_cache = {}
     
     def _safe_float(self, value, default: float = 50.0) -> float:
         """Convierte un valor a float de forma segura."""
-        if value is None:
-            return default
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            return default
+        if value is None: return default
+        try: return float(value)
+        except (ValueError, TypeError): return default
+
+    def _enrich_taxonomy_data(self, species_ids: List[int]):
+        """
+        Consulta directa a la API para obtener la jerarquía completa (nombres) de las especies.
+        """
+        self.logger.info(f"Fetching taxonomy details for {len(species_ids)} species to resolve Family/Genus names...")
+
+        base_url = "https://api.inaturalist.org/v1/taxa/"
+
+        headers = {
+            "User-Agent": "FSCL-Vision-Pipeline/1.1 (Research Project)",
+            "Accept": "application/json"
+        }
+
+        chunk_size = 30
+        for i in range(0, len(species_ids), chunk_size):
+            chunk = species_ids[i:i+chunk_size]
+            ids_str = ",".join(map(str, chunk))
+
+            try:
+                self.logger.debug(f"Querying API for IDs: {ids_str}")
+                response = requests.get(f"{base_url}{ids_str}", headers=headers)
+                
+                if response.status_code == 200:
+                    results = response.json().get('results', [])
+                    self.logger.debug(f"Received {len(results)} taxonomy records.")
+                    
+                    for taxon_full in results:
+                        sp_id = taxon_full.get('id')
+                        name = taxon_full.get('name', 'Unknown')
+                        common_name = taxon_full.get('preferred_common_name', '')
+
+                        family, genus = "Unknown_Family", "Unknown_Genus"
+                        
+                        ancestors = taxon_full.get('ancestors', [])
+                        if not ancestors:
+                            self.logger.warning(f"Taxon ID {sp_id} ({name}) returned with NO ancestors.")
+                        
+                        for anc in ancestors:
+                            rank = anc.get('rank', '').lower()
+                            anc_name = anc.get('name', 'Unknown')
+                            if rank == 'family': family = anc_name
+                            elif rank == 'genus': genus = anc_name
+                        
+                        self.taxonomy_cache[sp_id] = {
+                            'family': family,
+                            'genus': genus,
+                            'name': name,
+                            'common_name': common_name
+                        }
+                else:
+                    self.logger.error(f"API Error {response.status_code} for chunk {ids_str}")
+                
+                time.sleep(0.5)
+            except Exception as e:
+                self.logger.error(f"Critical error querying API: {e}")
+        self.logger.info(f"Taxonomy cache enriched. Total entries: {len(self.taxonomy_cache)}")
+
+    
+    def _get_taxonomy_path(self, taxon: Dict[str, Any]) -> Path:
+        """
+        Construye la ruta usando primero la caché enriquecida, o fallback a heurística.
+        """
+        species_id = taxon.get('id')
+        species_name = taxon.get('name', 'Unknown_Species').replace(' ','_')
+
+        # Buscar en caché enriquecida
+        if species_id in self.taxonomy_cache:
+            cached = self.taxonomy_cache[species_id]
+            if cached.get('name'):
+                species_name = cached['name'].replace(' ', '_')
+            return Path(cached['family']) / cached['genus'] / species_name
+        
+        # Fallbacks: Intentar leer del objeto taxon local (por si acaso tuviera ancestors)
+        family, genus = "Unknown_Family", "Unknown_Genus"
+        ancestors = taxon.get('ancestors', [])
+        for anc in ancestors:
+            rank = anc.get('rank', '').lower()
+            name = anc.get('name', 'Unknown')
+            if rank == 'family': family = name
+            elif rank == 'genus': genus = name
+
+        # Fallback heurístico (parsear string)
+        if genus == "Unknown_Genus" and '_' in species_name:
+            try:
+                parts = species_name.split('_')
+                if parts[0][0].isupper(): 
+                    genus = parts[0]
+            except Exception:
+                pass
+
+        return Path(family) / genus / species_name
     
     def organize_dataset(
         self,
@@ -94,7 +190,7 @@ class DatasetOrganizer:
         config: Optional[Dict[str, Any]] = None
     ) -> Path:
         """
-        Organiza el dataset final.
+        Organiza el dataset final aplicando la estructura taxonómica.
         
         Args:
             observations: Lista de observaciones seleccionadas
@@ -117,6 +213,7 @@ class DatasetOrganizer:
         dataset_path.mkdir(parents=True, exist_ok=True)
         images_path.mkdir(parents=True, exist_ok=True)
         
+        # Agrupar por ID de especies primero
         by_species = defaultdict(list)
         for obs in observations:
             taxon = obs.get('taxon', {})
@@ -124,11 +221,13 @@ class DatasetOrganizer:
             if species_id is not None:
                 by_species[species_id].append(obs)
         
+        # Filtrar clases con pocas muestras
         by_species = {
             k: v for k, v in by_species.items()
             if len(v) >= min_images_per_class
         }
         
+        # Filtrar top N clases si se solicita
         if n_classes and len(by_species) > n_classes:
             sorted_species = sorted(
                 by_species.items(),
@@ -136,38 +235,94 @@ class DatasetOrganizer:
                 reverse=True
             )
             by_species = dict(sorted_species[:n_classes])
+
+        # Recolectamos todos los IDs únicos y consultamos la API para obtener sus Nombres reales
+        unique_ids = list(by_species.keys())
+        self._enrich_taxonomy_data(unique_ids)
         
+
+        # Estructura para acumular la jerarquía
+        # Estructura: hierarchy[Family] -> {count: int, genera: { Genus -> {count: int, species: []} }}
+        hierarchy = {}
+        
+        # Inicializar Manifest
         manifest = {
             'dataset_name': dataset_name,
             'created_at': datetime.now().isoformat(),
             'total_images': 0,
             'total_species': len(by_species),
-            'classes': {}
+            'structure': 'Hierarchical: Family/Genus/Species',
+            'total_families': 0,
+            'total_genera': 0,
+            'families': [],
+            'genera': [],
+            'classes': {},
+            #'taxonomy_hierarchy' = {},
         }
         
-        all_quality_scores = []
-        all_dates = []
-        all_lats = []
-        all_lons = []
+        # Listas para estadísticas
+        all_quality_scores, all_dates, all_lats, all_lons = [], [], [], []
         
+        # Procesar Especies
         for species_id, species_obs in by_species.items():
-            species_name = species_obs[0].get('taxon', {}).get('name', 'Unknown')
-            common_name = species_obs[0].get('taxon', {}).get('preferred_common_name', '')
+            # Extraer info taxonómica de la primera observación
+            first_obs_taxon = species_obs[0].get('taxon', {})
+
+            # Recuperar nombre correcto desde caché o fallback
+            if species_id in self.taxonomy_cache:
+                species_name = self.taxonomy_cache[species_id].get('name', 'Unknown')
+            else:
+                species_name = first_obs_taxon.get('name', 'Unknown')
             
-            species_dir = images_path / str(species_id)
+            common_name = first_obs_taxon.get('taxon', {}).get('preferred_common_name', '')
+            count = len(species_obs)
+            
+            # --- DETERMINAR RUTA DE SALIDA ---
+            hierarchy_path = self._get_taxonomy_path(first_obs_taxon)
+
+            family_name = hierarchy_path.parts[0]
+            genus_name = hierarchy_path.parts[1] if len(hierarchy_path.parts) > 1 else 'Unknown'
+
+            # Si la familia no existe, la creamos
+            if family_name not in hierarchy: 
+                hierarchy[family_name] = {'count': 0, 'genera':{}}
+
+            # Sumamos al contador de la familia
+            hierarchy[family_name]['count'] += count
+
+            # Si el género no existe dentro de esa familia, lo creamos
+            if genus_name not in hierarchy[family_name]['genera']: 
+                hierarchy[family_name]['genera'][genus_name] = {'count': 0, 'species': []}
+
+            # Sumamos al contador del género
+            hierarchy[family_name]['genera'][genus_name]['count'] += count
+
+            # Agregar la especie a la lista del género
+            hierarchy[family_name]['genera'][genus_name]['species'].append({
+                'name': species_name,
+                'common_name': common_name,
+                'count': count,
+                'id': species_id
+            })
+
+            # Crear directorio recursivo (Familia/Género/Especie)
+            species_dir = images_path / hierarchy_path
             species_dir.mkdir(parents=True, exist_ok=True)
             
+            # Actualizar manifest con metadata jerárquica
             manifest['classes'][str(species_id)] = {
                 'name': species_name,
                 'common_name': common_name,
-                'count': len(species_obs),
+                'path': str(hierarchy_path),
+                'family': family_name,
+                'genus': genus_name,
+                'count': count,
                 'images': []
             }
             
             for obs in species_obs:
                 photos = obs.get('photos', [])
-                if not photos:
-                    continue
+                if not photos: continue
                 
                 photo = photos[0]
                 obs_id = obs.get('id', 'unknown')
@@ -176,10 +331,11 @@ class DatasetOrganizer:
                 
                 filename = f"{obs_id}_{photo_id}.jpg"
                 
+                # --- COPIADO DE IMÁGENES ---
                 if copy_images and self.source_dir:
                     source_image = self.source_dir / str(species_id) / filename
                     dest_image = species_dir / filename
-                    
+
                     if source_image.exists() and not dest_image.exists():
                         shutil.copy2(source_image, dest_image)
                     
@@ -189,6 +345,7 @@ class DatasetOrganizer:
                         if not dest_meta.exists():
                             shutil.copy2(source_meta, dest_meta)
                 
+                # Registrar en manifest
                 image_entry = {
                     'filename': filename,
                     'observation_id': obs_id,
@@ -216,9 +373,15 @@ class DatasetOrganizer:
                     all_lons.append(self._safe_float(obs['longitude'], 0))
             
             self.logger.info(
-                f"Organized {species_name}: {len(species_obs)} images"
+                f"Organized {species_name}: {len(species_obs)} images -> {hierarchy_path}"
             )
-        
+        # Guardamos la jerarquía completa en el manifest
+        manifest['taxonomy_hierarchy'] = hierarchy
+
+        # Calculamos totales simples basados en la jerarquía
+        manifest['total_families'] = len(hierarchy)
+        manifest['total_genera'] = sum(len(f['genera']) for f in hierarchy.values())
+
         manifest_path = dataset_path / 'species_manifest.json'
         with open(manifest_path, 'w', encoding='utf-8') as f:
             json.dump(manifest, f, indent=2, ensure_ascii=False)
@@ -334,6 +497,7 @@ class DatasetOrganizer:
             data_provenance=data_provenance
         )
     
+
     def _compute_statistics(
         self,
         manifest: Dict,
@@ -341,7 +505,6 @@ class DatasetOrganizer:
     ) -> Dict[str, Any]:
         """Computa estadisticas detalladas del dataset."""
         species_stats = []
-        
         for species_id, cls_data in manifest['classes'].items():
             cls_quality = [
                 img['quality_score'] for img in cls_data['images']
@@ -352,6 +515,8 @@ class DatasetOrganizer:
                 'species_id': species_id,
                 'name': cls_data['name'],
                 'common_name': cls_data.get('common_name', ''),
+                'family': cls_data.get('family', 'Unknown'),
+                'genus': cls_data.get('genus', 'Unknown'),
                 'count': cls_data['count'],
                 'quality_mean': float(np.mean(cls_quality)) if cls_quality else 0,
                 'quality_std': float(np.std(cls_quality)) if cls_quality else 0
@@ -361,10 +526,17 @@ class DatasetOrganizer:
             'summary': {
                 'total_images': manifest['total_images'],
                 'total_species': manifest['total_species'],
+                'total_genera': manifest['total_genera'],
+                'total_families': manifest['total_families'],
                 'images_per_species_mean': float(np.mean([s['count'] for s in species_stats])),
                 'quality_overall_mean': float(np.mean(quality_scores)) if quality_scores else 0
             },
             'by_species': species_stats,
+            'structure': manifest.get('structure', 'standard'),
+            'taxonomy_breakdown': {
+                'families_list': manifest['families'],
+                'genera_list': manifest['genera']
+            },
             'distribution': {
                 'images_histogram': self._compute_histogram(
                     [s['count'] for s in species_stats]
@@ -397,11 +569,29 @@ class DatasetOrganizer:
         metadata: DatasetMetadata
     ) -> str:
         """Genera README.md para el dataset."""
-        species_list = "\n".join([
-            f"- **{cls['name']}** ({cls.get('common_name', '')}): {cls['count']} images"
-            for cls in manifest['classes'].values()
-        ])
-        
+
+        # --- Generación del árbol visual ---
+        hierarchy = manifest.get('taxonomy_hierarchy', {})
+        tree_lines = []
+
+        # Ordenamos las familias alfabéticamente
+        for family_name in sorted(hierarchy.keys()):
+            fam_data = hierarchy[family_name]
+            tree_lines.append(f"- **{family_name}** ({fam_data['count']} images)")
+
+            # Ordenamos los géneros
+            for genus_name in sorted(fam_data['genera'].keys()):
+                gen_data = fam_data['genera'][genus_name]
+                # Usamos indentation para el nivel visual
+                tree_lines.append(f"    - **{genus_name}** ({gen_data['count']} images)")
+
+                # Ordenamos las especies
+                sorted_species = sorted(gen_data['species'], key=lambda x: x['name'])
+                for sp in sorted_species:
+                    tree_lines.append(f"        - **{sp['name']}**: {sp['count']} images")
+
+        species_list = "\n".join(tree_lines)
+
         # Extraer información del config si está disponible
         dataset_cfg = self.config.get('dataset', {})
         geography_cfg = self.config.get('geography', {})
@@ -420,6 +610,11 @@ class DatasetOrganizer:
                 geography_items.append(f"- **Province/State**: {geography_cfg['province']}")
             if geography_cfg.get('place_id'):
                 geography_items.append(f"- **iNaturalist Place ID**: {geography_cfg['place_id']}")
+            if geography_cfg.get('bounds'):
+                geography_items.append(f"- **Bounding Box**: South ({geography_cfg['bounds']['south']})," 
+                                       f" West ({geography_cfg['bounds']['west']}),"
+                                       f" North ({geography_cfg['bounds']['north']}),"
+                                       f" East ({geography_cfg['bounds']['east']})")
             if geography_items:
                 geography_section = "\n## Geographic Coverage\n\n" + "\n".join(geography_items) + "\n"
         
@@ -464,11 +659,14 @@ class DatasetOrganizer:
 
 - **Total Images**: {manifest['total_images']}
 - **Total Species**: {manifest['total_species']}
+- **Total Genera**: {manifest.get('total_genera', 0)}
+- **Total Families**: {manifest.get('total_families', 0)}
 {target_task}{version_info}- **Source**: iNaturalist
 - **Created**: {metadata.created_at}
 - **Pipeline Version**: {metadata.pipeline_version}
 {geography_section}{pipeline_section}
-## Species Included
+
+## Species Included (Hierarchical Breakdown)
 
 {species_list}
 
@@ -476,15 +674,19 @@ class DatasetOrganizer:
 
 ```
 {dataset_name}/
-├── images/
-│   ├── {{species_id}}/
-│   │   ├── {{obs_id}}_{{photo_id}}.jpg
-│   │   └── {{obs_id}}_{{photo_id}}.json
-│   └── ...
-├── species_manifest.json
-├── dataset_metadata.yaml
-├── statistics.json
-└── README.md
+    ├── images/
+    │   ├── {{Family}}/
+    │   │   ├── {{Genus}}/
+    │   │   │   ├── {{Species_Scientific_Name}}/
+    │   │   │   │   ├── {{obs_id}}_{{photo_id}}.jpg
+    │   │   │   │   └── {{obs_id}}_{{photo_id}}.json 
+    │   │   │   └── ...
+    │   │   └── ...             
+    │   └── ...
+    ├── species_manifest.json
+    ├── dataset_metadata.yaml
+    ├── statistics.json
+    └── README.md
 ```
 
 ## Usage
@@ -554,11 +756,27 @@ If you use this dataset, please cite:
         try:
             with open(manifest_path, encoding='utf-8') as f:
                 manifest = json.load(f)
+            # Iterar sobre las rutas guardadas en el manifest
+            missing = 0
+            for cls in manifest['classes'].values():
+                # Buscar la ruta jerárquica guardada
+                rel_path = cls.get('path')
+                if not rel_path:
+                    validation['warnings'].append(f"Missing path in manifest for {cls['name']}")
+                    continue
+                sp_dir = dataset_path / 'images' / rel_path
+                if not sp_dir.exists():
+                    validation['warnings'].append(f"Directory missing: {sp_dir}")
+                for img in cls['images']:
+                    if not (sp_dir / img['filename']).exists(): missing += 1
+            validation['stats']['missing_images'] = missing
+            if missing > 0: validation['warnings'].append(f"{missing} images missing")
         except json.JSONDecodeError as e:
             validation['valid'] = False
             validation['errors'].append(f"Invalid manifest JSON: {e}")
             return validation
         
+        """
         images_path = dataset_path / 'images'
         if not images_path.exists():
             validation['valid'] = False
@@ -595,7 +813,7 @@ If you use this dataset, please cite:
             'total_images_checked': total_images,
             'missing_images': missing_images
         }
-        
+        """
         self.logger.info(
             f"Validation complete: {validation['stats']}"
         )
