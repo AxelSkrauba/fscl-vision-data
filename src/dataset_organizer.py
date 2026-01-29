@@ -745,7 +745,12 @@ If you use this dataset, please cite:
     def validate_dataset(self, dataset_path: Path) -> Dict[str, Any]:
         """
         Valida integridad del dataset.
-        
+
+        Verifica que:
+        1. Existan los archivos de metadatos (manifest, stats, etc).
+        2. La estructura de carpetas (Familia/Género/Especie) coincida con el manifest.
+        3. Todas las imágenes listadas existan físicamente.
+
         Args:
             dataset_path: Ruta al dataset
         
@@ -760,74 +765,88 @@ If you use this dataset, please cite:
             'warnings': [],
             'stats': {}
         }
-        
+
+        # 1. Validar existencia del Manifest
         manifest_path = dataset_path / 'species_manifest.json'
         if not manifest_path.exists():
             validation['valid'] = False
             validation['errors'].append("Missing species_manifest.json")
             return validation
         
-        try:
-            with open(manifest_path, encoding='utf-8') as f:
-                manifest = json.load(f)
-            # Iterar sobre las rutas guardadas en el manifest
-            missing = 0
-            for cls in manifest['classes'].values():
-                # Buscar la ruta jerárquica guardada
-                rel_path = cls.get('path')
-                if not rel_path:
-                    validation['warnings'].append(f"Missing path in manifest for {cls['name']}")
-                    continue
-                sp_dir = dataset_path / 'images' / rel_path
-                if not sp_dir.exists():
-                    validation['warnings'].append(f"Directory missing: {sp_dir}")
-                for img in cls['images']:
-                    if not (sp_dir / img['filename']).exists(): missing += 1
-            validation['stats']['missing_images'] = missing
-            if missing > 0: validation['warnings'].append(f"{missing} images missing")
-        except json.JSONDecodeError as e:
-            validation['valid'] = False
-            validation['errors'].append(f"Invalid manifest JSON: {e}")
-            return validation
-        
-        """
+        # 2. Validar carpeta de imágenes raíz
         images_path = dataset_path / 'images'
         if not images_path.exists():
             validation['valid'] = False
             validation['errors'].append("Missing images/ directory")
             return validation
         
-        missing_images = 0
-        total_images = 0
-        
-        for species_id, cls_data in manifest['classes'].items():
-            species_dir = images_path / str(species_id)
+        try:
+            with open(manifest_path, encoding='utf-8') as f:
+                manifest = json.load(f)
+
             
-            if not species_dir.exists():
-                validation['warnings'].append(
-                    f"Missing directory for species {species_id}"
-                )
-                continue
-            
-            for img in cls_data['images']:
-                total_images += 1
-                img_path = species_dir / img['filename']
+            missing_images = 0
+            total_images_checked = 0
+
+            # 3. Iterar sobre las clases (especies)
+            for species_id, cls_data in manifest['classes'].items():
+
+                # Determinar la ruta esperada de la especie
+                # Prioridad 1: Usar 'path' si está guardado en el manifest
+                # Prioridad 2: Construir ruta jerárquica (Family/Genus/Species_Name)
+                if 'path' in cls_data:
+                    rel_path = Path(cls_data['path'])
+                else:
+                    # Fallback: Reconstruir ruta taxonómica
+                    family = cls_data.get('family', 'Unknown_Family')
+                    genus = cls_data.get('genus', 'Unknown_Genus')
+                    # Asegurar que el nombre de carpeta no tenga espacios
+                    folder_name = cls_data['name'].replace(" ", "_")
+                    rel_path = Path(family) / genus / folder_name
+
+                species_dir = images_path / rel_path
+
+                # Validar existencia del directorio de la especie
+                if not species_dir.exists():
+                    validation['warnings'].append(
+                        f"Missing directory for {cls_data['name']}: {species_dir}"
+                    )
+                    
+                    missing_images += len(cls_data.get('images', []))
+                    total_images_checked += len(cls_data.get('images', []))
+                    continue
                 
-                if not img_path.exists():
-                    missing_images += 1
-        
-        if missing_images > 0:
-            validation['warnings'].append(
-                f"{missing_images}/{total_images} images missing"
-            )
-        
-        validation['stats'] = {
+                # Validar existencia de cada imagen
+                for img in cls_data['images']:
+                    total_images_checked += 1
+                    img_path = species_dir / img['filename']
+                    
+                    if not img_path.exists():
+                        missing_images += 1
+            
+            # 4. Validar consistencia de contadores
+            if missing_images > 0:
+                validation['warnings'].append(
+                    f"{missing_images}/{total_images_checked} images missing from disk"
+                )
+            
+            validation['stats'] = {
             'total_species': len(manifest['classes']),
             'total_images_manifest': manifest['total_images'],
-            'total_images_checked': total_images,
+            'total_images_checked': total_images_checked,
             'missing_images': missing_images
-        }
-        """
+            }
+            
+        except json.JSONDecodeError as e:
+            validation['valid'] = False
+            validation['errors'].append(f"Invalid manifest JSON: {e}")
+            return validation
+        except Exception as e:
+            validation['valid'] = False
+            validation['errors'].append(f"Unexpected error during validation: {e}")
+            return validation
+        
+        
         self.logger.info(
             f"Validation complete: {validation['stats']}"
         )
