@@ -46,11 +46,22 @@ def main(config_path: str, max_per_taxon: int = None):
         f"Region: {config.get('geography', {}).get('region_name', 'Unknown')}")
 
     api_config = config.get('api', {})
+    # Los datasets pueden usar 'rate_limit_calls'/'rate_limit_period' (llamadas por periodo en segundos).
+    # Se soportan ambas convenciones con fallback a valores razonables.
+    rate_limit_requests_per_minute = api_config.get(
+        'rate_limit_requests_per_minute',
+        api_config.get('rate_limit_calls', 60)
+    )
+    rate_limit_period = api_config.get('rate_limit_period', 60)
+    # Convertir rate_limit_calls/rate_limit_period a requests_per_day para compatibilidad con el cliente
+    requests_per_day = api_config.get(
+        'rate_limit_requests_per_day',
+        int(rate_limit_requests_per_minute * (86400 / rate_limit_period))
+    )
     client = iNaturalistAPIClient(
         cache_dir=cache_dir,
-        requests_per_minute=api_config.get(
-            'rate_limit_requests_per_minute', 100),
-        requests_per_day=api_config.get('rate_limit_requests_per_day', 10000),
+        requests_per_minute=rate_limit_requests_per_minute,
+        requests_per_day=requests_per_day,
         max_retries=api_config.get('max_retries', 3),
         timeout=api_config.get('timeout_seconds', 30)
     )

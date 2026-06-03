@@ -29,13 +29,15 @@ python scripts/02_download_images.py --config config/mi_config.yaml
 
 ## Parámetros de Configuración Relevantes
 
+El script lee los siguientes parámetros desde la sección `api` del YAML:
+
 ```yaml
-download:
-  max_workers: 4           # Workers paralelos
-  image_size: "large"      # Tamaño: original, large, medium, small
-  save_metadata: true      # Guardar JSON por imagen
-  timeout: 30              # Timeout por descarga
+api:
+  download_workers: 4      # Workers paralelos
+  timeout_seconds: 30      # Timeout por descarga
 ```
+
+> **Nota**: `image_size` y `save_metadata` aún no están implementados en el pipeline. Las imágenes se descargan en su tamaño original disponible.
 
 ## Salida
 

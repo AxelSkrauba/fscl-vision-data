@@ -191,7 +191,7 @@ Configuración del cliente de la API de iNaturalist.
 | `rate_limit_calls` | integer | Llamadas máximas por período |
 | `rate_limit_period` | integer | Período en segundos |
 | `max_retries` | integer | Reintentos en caso de error |
-| `timeout` | integer | Timeout de conexión en segundos |
+| `timeout_seconds` | integer | Timeout de conexión en segundos |
 
 **Ejemplo:**
 
@@ -201,26 +201,26 @@ api:
   rate_limit_calls: 60
   rate_limit_period: 60
   max_retries: 3
-  timeout: 30
+  timeout_seconds: 30
 ```
 
 ### download
 
-Configuración para la descarga de imágenes.
+> **Nota**: El pipeline no utiliza una sección `download` independiente. Los parámetros de descarga se leen desde la sección `api`.
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| `max_workers` | integer | Número de workers paralelos |
-| `image_size` | string | Tamaño de imagen: `original`, `large`, `medium`, `small` |
-| `save_metadata` | boolean | Guardar metadatos JSON por imagen |
+| Parámetro (en `api`) | Tipo | Descripción |
+|----------------------|------|-------------|
+| `download_workers` | integer | Número de workers paralelos |
+| `timeout_seconds` | integer | Timeout de conexión en segundos |
+
+> `image_size` y `save_metadata` aún no están implementados. Las imágenes se descargan en su tamaño original disponible.
 
 **Ejemplo:**
 
 ```yaml
-download:
-  max_workers: 4
-  image_size: "large"
-  save_metadata: true
+api:
+  download_workers: 4
+  timeout_seconds: 30
 ```
 
 ### Otras opciones
@@ -229,7 +229,6 @@ download:
 |-----------|------|-------------|
 | `data_dir` | string | Directorio base para datos |
 | `logging.level` | string | Nivel de log: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
-| `random_seed` | integer | Semilla para reproducibilidad |
 
 **Ejemplo:**
 
@@ -237,7 +236,6 @@ download:
 data_dir: "./data"
 logging:
   level: "INFO"
-random_seed: 42
 ```
 
 ## Archivos de Configuración Incluidos

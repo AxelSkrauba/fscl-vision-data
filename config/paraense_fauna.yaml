@@ -131,7 +131,7 @@ deduplication:
 # Seleccion de muestras
 sampling:
   method: "clustering"
-  samples_per_species: 50
+  n_samples_per_species: 50
   min_samples_per_species: 15
 
 # Directorios

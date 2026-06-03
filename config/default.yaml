@@ -47,7 +47,7 @@ sampling:
   # Metodo: 'clustering', 'stratified', 'quality', 'random'
   method: "clustering"
   # Numero objetivo de muestras por especie
-  samples_per_species: 50
+  n_samples_per_species: 50
   # Minimo de muestras para incluir una especie
   min_samples_per_species: 10
 

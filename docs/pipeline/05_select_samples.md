@@ -94,8 +94,9 @@ Selección aleatoria con semilla fija para reproducibilidad.
 sampling:
   method: "random"
   n_samples_per_species: 100
-  random_seed: 42
 ```
+
+> **Nota**: La reproducibilidad se controla mediante el parámetro `random_state` del constructor `RepresentativeSampleSelector`, no desde el YAML.
 
 **Ventajas:**
 - Simple y rápido
@@ -113,7 +114,6 @@ sampling:
   n_samples_per_species: 100     # Muestras objetivo por especie
   min_samples_per_species: 20    # Mínimo para incluir especie
   balance_dataset: true          # Igualar muestras entre especies
-  random_seed: 42                # Semilla para reproducibilidad
 ```
 
 ### Balanceo de Dataset

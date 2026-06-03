@@ -68,7 +68,7 @@ def main(
     logger.info(f"Loaded {len(observations)} observations from {quality_file}")
     
     sampling_config = config.get('sampling', {})
-    n_samples = samples_per_species or sampling_config.get('samples_per_species', 50)
+    n_samples = samples_per_species or sampling_config.get('n_samples_per_species', 50)
     selection_method = method or sampling_config.get('method', 'clustering')
     min_samples = sampling_config.get('min_samples_per_species', 10)
     

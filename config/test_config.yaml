@@ -30,7 +30,7 @@ deduplication:
 
 sampling:
   method: "quality"
-  samples_per_species: 10
+  n_samples_per_species: 10
   min_samples_per_species: 5
 
 data_dir: "./data/test"
