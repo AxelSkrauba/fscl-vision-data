@@ -1,0 +1,103 @@
+# Configuracion MkDocs Material para FSCL-Vision Data Pipeline
+# Build local:   mkdocs serve
+# Build prod:    mkdocs build
+
+site_name: FSCL-Vision Data Pipeline
+site_description: Pipeline de adquisicion y preparacion de datasets de fauna silvestre para few-shot learning.
+site_url: https://axelskrauba.github.io/fscl-vision-data/
+repo_url: https://github.com/AxelSkrauba/fscl-vision-data
+repo_name: AxelSkrauba/fscl-vision-data
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: es
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - def_list
+
+plugins:
+  - search:
+      lang: es
+
+nav:
+  - Inicio: README.md
+  - Configuracion: configuration.md
+  - Pipeline:
+      - Resumen: pipeline/README.md
+      - 1. Obtencion de Observaciones: pipeline/01_fetch_observations.md
+      - 2. Descarga de Imagenes: pipeline/02_download_images.md
+      - 3. Deduplicacion: pipeline/03_deduplicate.md
+      - 4. Evaluacion de Calidad: pipeline/04_assess_quality.md
+      - 5. Seleccion de Muestras: pipeline/05_select_samples.md
+      - 6. Organizacion del Dataset: pipeline/06_organize_dataset.md
+  - Modulos:
+      - Resumen: modules/README.md
+      - API Client: modules/api_client.md
+      - Image Downloader: modules/image_downloader.md
+      - Deduplicator: modules/deduplicator.md
+      - Quality Assessor: modules/quality_assessor.md
+      - Sample Selector: modules/sample_selector.md
+      - Dataset Organizer: modules/dataset_organizer.md
+      - Local Cache: modules/local_cache.md
+      - Utilidades:
+          - Resumen: modules/utils/README.md
+          - Logger: modules/utils/logger.md
+          - Rate Limiter: modules/utils/rate_limiter.md
+          - Geo Utils: modules/utils/geo_utils.md
+          - Image Utils: modules/utils/image_utils.md

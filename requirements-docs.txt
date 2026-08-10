@@ -1,0 +1,5 @@
+# Dependencias para construir la documentacion (MkDocs Material)
+# Instalar: pip install -r requirements-docs.txt
+
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
