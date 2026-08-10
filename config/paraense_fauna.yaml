@@ -19,100 +19,100 @@ fauna:
   taxa:
     # Grandes felinos
     - name: "Panthera onca"
-      taxon_id: 41976
+      taxon_id: 41970
       common_names: ["Jaguar", "Yaguarete"]
       max_observations: 500
 
     - name: "Puma concolor"
-      taxon_id: 41975
+      taxon_id: 42007
       common_names: ["Puma", "Mountain Lion"]
       max_observations: 500
 
     # Felinos menores
     - name: "Leopardus pardalis"
-      taxon_id: 41978
+      taxon_id: 41997
       common_names: ["Ocelot", "Ocelote"]
       max_observations: 400
 
     - name: "Leopardus wiedii"
-      taxon_id: 41979
+      taxon_id: 41988
       common_names: ["Margay", "Gato tigre"]
       max_observations: 300
 
     # Primates
     - name: "Alouatta caraya"
-      taxon_id: 43550
+      taxon_id: 43435
       common_names: ["Black Howler Monkey", "Mono aullador negro"]
       max_observations: 500
 
     - name: "Sapajus nigritus"
-      taxon_id: 43524
+      taxon_id: 410834
       common_names: ["Black Capuchin", "Mono cai"]
       max_observations: 400
 
     # Tapir
     - name: "Tapirus terrestris"
-      taxon_id: 42185
+      taxon_id: 43353
       common_names: ["South American Tapir", "Tapir"]
       max_observations: 400
 
     # Pecaries
     - name: "Pecari tajacu"
-      taxon_id: 42250
+      taxon_id: 42113
       common_names: ["Collared Peccary", "Pecari de collar"]
       max_observations: 400
 
     - name: "Tayassu pecari"
-      taxon_id: 42251
+      taxon_id: 42115
       common_names: ["White-lipped Peccary", "Pecari labios blancos"]
       max_observations: 300
 
     # Ciervos
     - name: "Mazama americana"
-      taxon_id: 42389
+      taxon_id: 42176
       common_names: ["Red Brocket", "Corzuela colorada"]
       max_observations: 400
 
-    - name: "Mazama nana"
-      taxon_id: 42390
+    - name: "Mazama nanus"
+      taxon_id: 42178
       common_names: ["Brazilian Dwarf Brocket", "Corzuela enana"]
       max_observations: 300
 
     # Roedores grandes
     - name: "Cuniculus paca"
-      taxon_id: 45453
+      taxon_id: 74257
       common_names: ["Paca", "Paca"]
       max_observations: 400
 
     - name: "Dasyprocta azarae"
-      taxon_id: 45429
+      taxon_id: 43721
       common_names: ["Azara's Agouti", "Aguti"]
       max_observations: 400
 
     # Carnivoros menores
     - name: "Nasua nasua"
-      taxon_id: 41684
+      taxon_id: 41670
       common_names: ["South American Coati", "Coati"]
       max_observations: 500
 
     - name: "Eira barbara"
-      taxon_id: 41631
+      taxon_id: 41774
       common_names: ["Tayra", "Irar"]
       max_observations: 300
 
     # Aves emblematicas
     - name: "Harpia harpyja"
-      taxon_id: 5303
+      taxon_id: 5321
       common_names: ["Harpy Eagle", "Aguila arpia"]
       max_observations: 200
 
     - name: "Ramphastos toco"
-      taxon_id: 18266
+      taxon_id: 18793
       common_names: ["Toco Toucan", "Tucan grande"]
       max_observations: 500
 
     - name: "Ara chloropterus"
-      taxon_id: 18778
+      taxon_id: 19016
       common_names: ["Red-and-green Macaw", "Guacamayo rojo"]
       max_observations: 400
 

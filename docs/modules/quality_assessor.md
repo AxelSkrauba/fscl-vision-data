@@ -4,7 +4,39 @@ Módulo: `src/quality_assessor.py`
 
 ## Descripción
 
-Evalúa la calidad visual de imágenes calculando métricas objetivas como nitidez, exposición, contraste, composición y detección de blur.
+Evalúa la calidad visual de imágenes calculando métricas objetivas: nitidez (sharpness), exposición, contraste, composición (entropía de Shannon) y detección de blur. Cada métrica retorna un score normalizado a 0-100, y se combinan en un score compuesto ponderado.
+
+## Dataclass
+
+### `QualityScores`
+
+```python
+from src.quality_assessor import QualityScores
+
+scores = QualityScores(
+    sharpness=75.3,
+    exposure=82.1,
+    contrast=68.5,
+    composition=55.0,
+    blur=12.3,
+    overall=71.2
+)
+
+scores.to_dict()
+# {'sharpness': 75.3, 'exposure': 82.1, 'contrast': 68.5,
+#  'composition': 55.0, 'blur': 12.3, 'overall': 71.2}
+```
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `sharpness` | float | Nitidez (0-100) |
+| `exposure` | float | Exposición (0-100) |
+| `contrast` | float | Contraste (0-100) |
+| `composition` | float | Complejidad visual por entropía (0-100) |
+| `blur` | float | Score anti-blur: **alto = nítido** (0-100) |
+| `overall` | float | Score compuesto ponderado (0-100) |
+
+> **Nota sobre `blur`:** a diferencia de lo que su nombre sugiere, el score de blur es **alto cuando la imagen NO está borrosa**. Es decir, funciona como un "anti-blur / nitidez". Esto se refleja en la fórmula del score compuesto, donde `blur` se suma directamente (sin invertir).
 
 ## Clase Principal
 
@@ -23,7 +55,7 @@ assessor = ImageQualityAssessor(
 
 | Parámetro | Tipo | Descripción | Valor por defecto |
 |-----------|------|-------------|-------------------|
-| `weights` | Dict | Pesos personalizados para métricas | `None` (usa defaults) |
+| `weights` | Dict[str, float] | Pesos personalizados para cada métrica | `None` (usa defaults) |
 | `logger` | Logger | Logger opcional | `None` |
 
 #### Pesos por Defecto
@@ -45,7 +77,7 @@ DEFAULT_WEIGHTS = {
 Evalúa la calidad de una imagen.
 
 ```python
-metrics = assessor.assess_quality(image_path)
+scores = assessor.assess_quality(image_path)
 ```
 
 #### Parámetros
@@ -56,27 +88,16 @@ metrics = assessor.assess_quality(image_path)
 
 #### Retorno
 
-Diccionario con métricas de calidad:
-
-```python
-{
-    'sharpness': 75.3,      # 0-100
-    'exposure': 82.1,       # 0-100
-    'contrast': 68.5,       # 0-100
-    'composition': 55.0,    # 0-100
-    'blur': 12.3,           # 0-100 (menor es mejor)
-    'overall_score': 71.2   # 0-100
-}
-```
+Instancia de `QualityScores` (o `None` si hay error). Si OpenCV no está disponible, retorna un `QualityScores` con todos los scores en 50.
 
 ### `assess_batch`
 
-Evalúa múltiples imágenes.
+Evalúa múltiples imágenes de forma **secuencial**.
 
 ```python
 results = assessor.assess_batch(
     image_paths,
-    n_workers=4
+    progress_callback=None
 )
 ```
 
@@ -84,153 +105,179 @@ results = assessor.assess_batch(
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
-| `image_paths` | List[str] | Lista de rutas a imágenes |
-| `n_workers` | int | Workers paralelos | 
+| `image_paths` | List[Path] | Lista de rutas a imágenes |
+| `progress_callback` | callable | Callback `(current, total)` invocado cada 100 imágenes |
 
 #### Retorno
 
-Diccionario `{path: metrics}` para cada imagen.
+Diccionario `{str(path): QualityScores}` para cada imagen evaluada con éxito.
+
+> **Nota:** No hay paralelización; la evaluación es secuencial. El callback de progreso se llama cada 100 imágenes y se loguea cada 500.
 
 ### `filter_by_quality`
 
-Filtra observaciones por umbral de calidad.
+Filtra imágenes por umbrales de calidad a partir de los scores calculados.
 
 ```python
-passed, rejected = assessor.filter_by_quality(
-    observations,
-    image_dir,
-    min_score=40,
-    max_blur=30
+passed = assessor.filter_by_quality(
+    scores,
+    min_overall=40.0,
+    min_sharpness=None,
+    max_blur=None
 )
 ```
 
+#### Parámetros
+
+| Parámetro | Tipo | Descripción | Default |
+|-----------|------|-------------|---------|
+| `scores` | Dict[str, QualityScores] | Scores por imagen (de `assess_batch`) | — |
+| `min_overall` | float | Score overall mínimo | `40.0` |
+| `min_sharpness` | float \| None | Sharpness mínimo (opcional) | `None` |
+| `max_blur` | float \| None | Blurriness máxima permitida (opcional) | `None` |
+
+#### Retorno
+
+Lista de paths que pasan los filtros.
+
+> **Semántica de `max_blur`:** se rechaza si `score.blur < (100 - max_blur)`, es decir, si el "blurriness" `(100 - blur)` supera el máximo. Coherente con que `blur` alto = nítido.
+
 ### `get_statistics`
 
-Calcula estadísticas de un conjunto de métricas.
+Calcula estadísticas de los scores de calidad.
 
 ```python
-stats = assessor.get_statistics(all_metrics)
+stats = assessor.get_statistics(scores)
+```
+
+#### Parámetros
+
+| Parámetro | Tipo | Descripción |
+|-----------|------|-------------|
+| `scores` | Dict[str, QualityScores] | Scores por imagen |
+
+#### Retorno
+
+Diccionario por métrica (`sharpness`, `exposure`, `contrast`, `composition`, `blur`, `overall`), cada una con `mean`, `std`, `min`, `max`, `median`. Devuelve `{}` si `scores` está vacío.
+
+```python
+{
+    'overall': {'mean': 65.4, 'std': 15.2, 'min': 25.1, 'max': 92.3, 'median': 66.0},
+    'sharpness': {...},
+    ...
+}
 ```
 
 ## Métricas Detalladas
 
 ### Nitidez (Sharpness)
 
-Utiliza la varianza del operador Laplaciano para detectar bordes:
+Varianza del operador Laplaciano, normalizada al rango 0-100:
 
 ```python
-def _calculate_sharpness(self, gray_image):
-    laplacian = cv2.Laplacian(gray_image, cv2.CV_64F)
+def _assess_sharpness(self, gray):
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
     variance = laplacian.var()
-    # Normalizar a 0-100
-    return min(100, variance / 10)
+    return self._normalize_score(variance, min_val=100, max_val=2000)
 ```
 
-**Interpretación:**
-- **> 70**: Imagen muy nítida
-- **40-70**: Nitidez aceptable
-- **< 40**: Imagen borrosa
+Mayor varianza = imagen más nítida. La normalización mapea el rango `[100, 2000]` a `[0, 100]`.
 
 ### Exposición
 
-Analiza el histograma de luminosidad:
+Analiza el histograma de luminosidad y penaliza desvíos respecto a una distribución ideal:
 
 ```python
-def _calculate_exposure(self, gray_image):
-    hist = cv2.calcHist([gray_image], [0], None, [256], [0, 256])
-    hist = hist.flatten() / hist.sum()
-    
-    # Penalizar extremos
-    dark_ratio = hist[:50].sum()
-    bright_ratio = hist[200:].sum()
-    
-    # Score óptimo cuando la distribución es balanceada
-    score = 100 - (dark_ratio + bright_ratio) * 100
-    return max(0, score)
-```
+def _assess_exposure(self, gray):
+    hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+    hist_norm = hist.flatten() / hist.sum()
 
-**Interpretación:**
-- **> 70**: Buena exposición
-- **40-70**: Exposición aceptable
-- **< 40**: Sub/sobreexposición
+    dark_ratio = np.sum(hist_norm[:64])      # px < 64
+    bright_ratio = np.sum(hist_norm[192:])   # px > 192
+    mid_ratio = np.sum(hist_norm[64:192])
+
+    # Ideales: ~15% oscuro, ~10% brillante
+    dark_penalty = abs(dark_ratio - 0.15) * 100
+    bright_penalty = abs(bright_ratio - 0.10) * 100
+
+    score = 100 - (dark_penalty + bright_penalty)
+    if mid_ratio < 0.5:
+        score -= 20
+
+    return max(0, min(100, score))
+```
 
 ### Contraste
 
-Desviación estándar de la luminosidad:
+Desviación estándar de la luminosidad, normalizada:
 
 ```python
-def _calculate_contrast(self, gray_image):
-    std = np.std(gray_image)
-    # Normalizar (std típico 40-80)
-    return min(100, std * 1.5)
+def _assess_contrast(self, gray):
+    std = gray.std()
+    return self._normalize_score(std, min_val=20, max_val=80)
 ```
 
-**Interpretación:**
-- **> 60**: Buen contraste
-- **30-60**: Contraste moderado
-- **< 30**: Imagen plana
+El rango `[20, 80]` se mapea a `[0, 100]`.
 
-### Composición
+### Composición (Entropía de Shannon)
 
-Evalúa la posición del sujeto respecto a la regla de tercios:
+> **Decisión de diseño:** la "composición" se estima mediante **entropía de Shannon** de la imagen en escala de grises, no mediante regla de tercios ni detección de ROI. El framework apunta a tareas de few-shot learning sobre cámaras trampa, donde el encuadre fotográfico es irrelevante (el animal aparece en cualquier parte de la toma). Lo que importa es la diversidad y riqueza visual de los ejemplares, no su posición en el frame. A mayor entropía, la imagen se interpreta como más compleja/interesante visualmente.
 
 ```python
-def _calculate_composition(self, image):
-    # Detectar región de interés (área más contrastada)
-    roi_center = detect_roi(image)
-    
-    # Puntos de tercios
-    thirds_points = [
-        (w/3, h/3), (2*w/3, h/3),
-        (w/3, 2*h/3), (2*w/3, 2*h/3)
-    ]
-    
-    # Distancia mínima a un punto de tercios
-    min_distance = min(distance(roi_center, p) for p in thirds_points)
-    
-    # Menor distancia = mejor composición
-    return 100 - min(100, min_distance / diagonal * 200)
+def _assess_composition(self, gray):
+    entropy = self._calculate_entropy(gray)
+    return self._normalize_score(entropy, min_val=4.0, max_val=7.5)
+
+@staticmethod
+def _calculate_entropy(image):
+    hist = cv2.calcHist([image], [0], None, [256], [0, 256])
+    hist = hist.flatten()
+    hist = hist / hist.sum()
+    hist = hist[hist > 0]
+    return -np.sum(hist * np.log2(hist))
 ```
 
-### Blur
+La entropía (en bits) se normaliza del rango `[4.0, 7.5]` a `[0, 100]`.
 
-Detección de desenfoque mediante análisis de frecuencias:
+### Blur (Anti-blur)
+
+Detección de desenfoque mediante **varianza del Laplaciano** (no FFT):
 
 ```python
-def _calculate_blur(self, gray_image):
-    # FFT para analizar frecuencias
-    fft = np.fft.fft2(gray_image)
-    fft_shift = np.fft.fftshift(fft)
-    magnitude = np.abs(fft_shift)
-    
-    # Ratio de altas frecuencias
-    high_freq_ratio = high_freq_energy / total_energy
-    
-    # Menor ratio = más blur
-    blur_score = 100 - high_freq_ratio * 100
-    return blur_score
+def _assess_blur(self, gray):
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+    variance = laplacian.var()
+    blur_threshold = 100
+
+    if variance < blur_threshold:
+        return max(0, (variance / blur_threshold) * 50)        # 0-50: borrosa
+    else:
+        return min(100, 50 + (variance - blur_threshold) / 40)  # 50-100: nítida
 ```
 
-**Interpretación:**
-- **< 20**: Imagen nítida
-- **20-40**: Blur leve
-- **> 40**: Blur significativo
+**Interpretación (alto = nítido):**
+- **> 50**: Imagen nítida
+- **< 50**: Imagen con blur significativo
+
+> El score es **alto cuando la imagen NO está borrosa**. Por eso entra directamente (sin invertir) en el score compuesto.
 
 ## Score Compuesto
 
-El score final combina todas las métricas:
+El score final combina todas las métricas con sus pesos. Nótese que `blur` se suma directamente (alto = bueno), a diferencia de un esquema donde se invertiría:
 
 ```python
-def _calculate_overall_score(self, metrics):
-    score = (
-        metrics['sharpness'] * self.weights['sharpness'] +
-        metrics['exposure'] * self.weights['exposure'] +
-        metrics['contrast'] * self.weights['contrast'] +
-        metrics['composition'] * self.weights['composition'] +
-        (100 - metrics['blur']) * self.weights['blur']
-    )
-    return score
+overall = (
+    sharpness * self.weights['sharpness'] +
+    exposure * self.weights['exposure'] +
+    contrast * self.weights['contrast'] +
+    composition * self.weights['composition'] +
+    blur * self.weights['blur']
+)
 ```
+
+## Normalización
+
+`_normalize_score(value, min_val, max_val)` mapea linealmente `value` del rango `[min_val, max_val]` a `[0, 100]`, acotando al rango. Si `max_val <= min_val`, retorna 50.
 
 ## Ejemplo Completo
 
@@ -250,20 +297,23 @@ assessor = ImageQualityAssessor(
 )
 
 # Evaluar una imagen
-metrics = assessor.assess_quality("image.jpg")
-print(f"Score: {metrics['overall_score']:.1f}")
-print(f"Nitidez: {metrics['sharpness']:.1f}")
-print(f"Blur: {metrics['blur']:.1f}")
+scores = assessor.assess_quality("image.jpg")
+print(f"Score: {scores.overall:.1f}")
+print(f"Nitidez: {scores.sharpness:.1f}")
+print(f"Blur (alto=nítido): {scores.blur:.1f}")
 
 # Evaluar batch
 image_dir = Path("data/raw/species")
 image_paths = list(image_dir.glob("*.jpg"))
-all_metrics = assessor.assess_batch(image_paths, n_workers=4)
+all_scores = assessor.assess_batch(image_paths)
 
 # Estadísticas
-stats = assessor.get_statistics(list(all_metrics.values()))
-print(f"Media: {stats['mean']:.1f}")
-print(f"Std: {stats['std']:.1f}")
+stats = assessor.get_statistics(all_scores)
+print(f"Media overall: {stats['overall']['mean']:.1f}")
+print(f"Std overall: {stats['overall']['std']:.1f}")
+
+# Filtrar por calidad
+passed = assessor.filter_by_quality(all_scores, min_overall=40, max_blur=30)
 ```
 
 ## Consideraciones
@@ -280,10 +330,9 @@ Por eso, umbrales moderados (35-45) suelen ser apropiados.
 
 ### Rendimiento
 
-La evaluación de calidad es CPU-intensiva. Para datasets grandes:
-- Usar `assess_batch` con múltiples workers
-- Considerar reducir resolución para análisis
-- Cachear resultados
+La evaluación de calidad es CPU-intensiva y **secuencial**. Para datasets grandes:
+- Considerar reducir resolución antes del análisis
+- Cachear resultados (el pipeline ya cachea `observations_quality.json`)
 
 ## Dependencias
 

@@ -55,7 +55,7 @@ fauna:
   taxa:
     # === EN PELIGRO CRÍTICO (CR) ===
     - name: "Panthera onca"
-      taxon_id: 41944
+      taxon_id: 41970
       common_names: ["Yaguareté", "Jaguar"]
       max_observations: 30
       conservation_status: "CR"
@@ -137,7 +137,7 @@ fauna:
       notes: "Especie endémica del Bosque Atlántico"
 
     - name: "Notharchus swainsoni"
-      taxon_id: 18262
+      taxon_id: 1591
       common_names: ["Chacurú grande", "Buff-bellied Puffbird"]
       max_observations: 55
       conservation_status: "VU"
@@ -222,7 +222,7 @@ fauna:
       iucn_category: "Near Threatened"
 
     - name: "Spizaetus melanoleucus"
-      taxon_id: 5282
+      taxon_id: 73433
       common_names: ["Águila viuda", "Black-and-white Hawk-Eagle"]
       max_observations: 30
       conservation_status: "NT"

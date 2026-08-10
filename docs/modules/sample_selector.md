@@ -14,7 +14,7 @@ Selecciona muestras representativas de observaciones utilizando diferentes estra
 from src.sample_selector import RepresentativeSampleSelector
 
 selector = RepresentativeSampleSelector(
-    method="quality",
+    method="clustering",
     random_state=42,
     logger=None
 )
@@ -24,7 +24,7 @@ selector = RepresentativeSampleSelector(
 
 | Parámetro | Tipo | Descripción | Valor por defecto |
 |-----------|------|-------------|-------------------|
-| `method` | str | Método de selección | `"quality"` |
+| `method` | str | Método de selección | `"clustering"` |
 | `random_state` | int | Semilla para reproducibilidad | `42` |
 | `logger` | Logger | Logger opcional | `None` |
 
@@ -45,9 +45,10 @@ selector = RepresentativeSampleSelector(
 @dataclass
 class SampleSelectionResult:
     selected: List[Dict]           # Observaciones seleccionadas
-    excluded: List[Dict]           # Observaciones excluidas
-    by_species: Dict[int, List]    # Selección por especie
-    stats: Dict                    # Estadísticas del proceso
+    total_candidates: int          # Total de observaciones recibidas
+    total_selected: int            # Total seleccionado
+    by_species: Dict[int, int]     # Cantidad seleccionada por especie (taxon_id -> n)
+    selection_method: str          # Método usado
 ```
 
 ## Métodos
@@ -59,22 +60,26 @@ Selecciona muestras de una lista de observaciones.
 ```python
 result = selector.select_samples(
     observations,
-    n_samples=100,
-    min_samples=20
+    n_samples_per_species=50,
+    min_samples_per_species=10,
+    diversity_weight=0.7,
+    quality_weight=0.3
 )
 ```
 
 #### Parámetros
 
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| `observations` | List[Dict] | Lista de observaciones |
-| `n_samples` | int | Muestras objetivo por especie |
-| `min_samples` | int | Mínimo para incluir especie |
+| Parámetro | Tipo | Descripción | Default |
+|-----------|------|-------------|---------|
+| `observations` | List[Dict] | Lista de observaciones (con `quality_score` si disponible) | — |
+| `n_samples_per_species` | int | Muestras objetivo por especie | `50` |
+| `min_samples_per_species` | int | Mínimo para incluir especie | `10` |
+| `diversity_weight` | float | Peso de diversidad en selección (0-1) | `0.7` |
+| `quality_weight` | float | Peso de calidad en selección (0-1) | `0.3` |
 
 #### Retorno
 
-`SampleSelectionResult` con observaciones seleccionadas y estadísticas.
+`SampleSelectionResult` con observaciones seleccionadas y conteos por especie.
 
 ### `balance_dataset`
 
@@ -83,24 +88,44 @@ Balancea el número de muestras entre especies.
 ```python
 balanced = selector.balance_dataset(
     observations,
-    target_per_species=None  # None = mínimo disponible
+    target_per_species,        # obligatorio (int)
+    allow_undersampling=True
 )
 ```
+
+| Parámetro | Tipo | Descripción | Default |
+|-----------|------|-------------|---------|
+| `observations` | List[Dict] | Lista de observaciones | — |
+| `target_per_species` | int | Número objetivo por especie (obligatorio) | — |
+| `allow_undersampling` | bool | Si reducir (por calidad) las especies con más muestras | `True` |
+
+#### Retorno
+
+Lista de observaciones balanceada.
 
 ## Estrategias de Selección
 
 ### Por Calidad (`quality`)
 
-Ordena por `quality_metrics.overall_score` y selecciona los mejores:
+Ordena por `quality_score` (escrito por la etapa 4) y selecciona los mejores:
 
 ```python
 def _select_by_quality(self, observations, n_samples):
     sorted_obs = sorted(
         observations,
-        key=lambda x: x.get('quality_metrics', {}).get('overall_score', 0),
+        key=lambda o: self._get_quality_score(o),
         reverse=True
     )
     return sorted_obs[:n_samples]
+
+def _get_quality_score(self, obs):
+    score = obs.get('quality_score', 50)
+    if score is None:
+        return 50.0
+    try:
+        return float(score)
+    except (TypeError, ValueError):
+        return 50.0
 ```
 
 **Ventajas:**
@@ -113,26 +138,41 @@ def _select_by_quality(self, observations, n_samples):
 
 ### Por Clustering (`clustering`)
 
-Maximiza diversidad visual mediante K-Means:
+Maximiza diversidad visual mediante K-Means en un espacio de características (ubicación, fecha, calidad) escalado con `StandardScaler`. De cada cluster se selecciona la observación con mejor balance diversidad-calidad:
 
 ```python
-def _select_by_clustering(self, observations, n_samples):
-    # Extraer características (ubicación, fecha, calidad)
-    features = extract_features(observations)
-    
-    # K-Means con K = n_samples
-    kmeans = KMeans(n_clusters=n_samples, random_state=self.random_state)
-    kmeans.fit(features)
-    
-    # Seleccionar observación más cercana a cada centroide
+def _select_by_clustering(self, observations, n_samples, diversity_weight, quality_weight):
+    if len(observations) <= n_samples:
+        return observations
+
+    features = self._extract_features(observations)  # lat, lon, día del año, quality_score
+    if features is None or len(features) < n_samples:
+        return self._select_by_quality(observations, n_samples)
+
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
+
+    kmeans = KMeans(n_clusters=min(n_samples, len(observations)),
+                    random_state=self.random_state, n_init=10)
+    labels = kmeans.fit_predict(features_scaled)
+
     selected = []
-    for i in range(n_samples):
-        cluster_obs = [obs for obs, label in zip(observations, kmeans.labels_) if label == i]
-        best = min(cluster_obs, key=lambda x: distance_to_centroid(x, kmeans.cluster_centers_[i]))
-        selected.append(best)
-    
-    return selected
+    for cluster_id in range(n_clusters):
+        cluster_obs = [observations[i] for i in np.where(labels == cluster_id)[0]]
+        if not cluster_obs:
+            continue
+        selected.append(self._select_best_from_cluster(cluster_obs, quality_weight))
+
+    # Completar hasta n_samples con los de mayor calidad restantes
+    if len(selected) < n_samples:
+        remaining = [o for o in observations if o not in selected]
+        remaining.sort(key=lambda o: self._get_quality_score(o), reverse=True)
+        selected.extend(remaining[:n_samples - len(selected)])
+
+    return selected[:n_samples]
 ```
+
+Si el clustering falla, cae automáticamente al método `quality`.
 
 **Ventajas:**
 - Maximiza diversidad
@@ -207,20 +247,19 @@ selector = RepresentativeSampleSelector(
 # Seleccionar muestras
 result = selector.select_samples(
     observations,
-    n_samples=100,
-    min_samples=20
+    n_samples_per_species=100,
+    min_samples_per_species=20
 )
 
 print(f"Seleccionadas: {len(result.selected)}")
 print(f"Especies incluidas: {len(result.by_species)}")
 
-# Ver estadísticas por especie
-for species_id, obs_list in result.by_species.items():
-    species_name = obs_list[0].get('taxon', {}).get('name', 'Unknown')
-    print(f"  {species_name}: {len(obs_list)} muestras")
+# by_species es Dict[int, int]: taxon_id -> cantidad seleccionada
+for species_id, count in result.by_species.items():
+    print(f"  {species_id}: {count} muestras")
 
-# Balancear dataset
-balanced = selector.balance_dataset(result.selected)
+# Balancear dataset (target_per_species es obligatorio)
+balanced = selector.balance_dataset(result.selected, target_per_species=20)
 print(f"Balanceado: {len(balanced)} observaciones")
 ```
 
@@ -236,8 +275,8 @@ El selector garantiza reproducibilidad mediante:
 selector1 = RepresentativeSampleSelector(method="random", random_state=42)
 selector2 = RepresentativeSampleSelector(method="random", random_state=42)
 
-result1 = selector1.select_samples(observations, n_samples=50)
-result2 = selector2.select_samples(observations, n_samples=50)
+result1 = selector1.select_samples(observations, n_samples_per_species=50)
+result2 = selector2.select_samples(observations, n_samples_per_species=50)
 
 assert result1.selected == result2.selected  # Siempre True
 ```
@@ -246,18 +285,17 @@ assert result1.selected == result2.selected  # Siempre True
 
 ### Mínimo de Muestras
 
-Las especies con menos de `min_samples` observaciones se excluyen:
+Las especies con menos de `min_samples_per_species` observaciones se excluyen (se loguea un `warning` y no se incluyen en `selected`):
 
 ```python
 result = selector.select_samples(
     observations,
-    n_samples=100,
-    min_samples=20  # Especies con < 20 se excluyen
+    n_samples_per_species=100,
+    min_samples_per_species=20  # Especies con < 20 se excluyen
 )
 
-# Ver especies excluidas
-for species_id, reason in result.stats['excluded_species'].items():
-    print(f"Excluida: {species_id} - {reason}")
+# Las especies excluidas no aparecen en result.by_species;
+# el total se refleja en result.total_candidates vs result.total_selected.
 ```
 
 ### Few-Shot Learning
@@ -267,7 +305,9 @@ Para tareas de few-shot learning:
 ```python
 # Support set pequeño
 selector = RepresentativeSampleSelector(method="clustering")
-result = selector.select_samples(observations, n_samples=5, min_samples=5)
+result = selector.select_samples(
+    observations, n_samples_per_species=5, min_samples_per_species=5
+)
 
 # Maximiza diversidad en pocas muestras
 ```

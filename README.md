@@ -156,8 +156,8 @@ sampling:
 fauna:
   taxa:
     - name: "Panthera onca"
-      taxon_id: 41944                    # Verificar en iNaturalist
-      common_names: ["Jaguar"]
+      taxon_id: 41970                    # Desde iNaturalist
+      common_names: ["Yaguareté"]
       max_observations: 30
 ```
 

@@ -96,10 +96,11 @@ Umbrales para la evaluación de calidad de imágenes.
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
-| `minimum_width` | integer | Ancho mínimo en píxeles |
-| `minimum_height` | integer | Alto mínimo en píxeles |
-| `quality_score_threshold` | float | Score mínimo de calidad (0-100) |
-| `max_blur_detected` | float | Máximo nivel de blur permitido |
+| `minimum_width` | integer | Ancho mínimo en píxeles (las imágenes menores se descartan) |
+| `minimum_height` | integer | Alto mínimo en píxeles (las imágenes menores se descartan) |
+| `quality_score_threshold` | float | Score overall mínimo de calidad (0-100) |
+| `max_blur_detected` | float | Blurriness máxima permitida (0-100, menor = más estricto). Se exige `blur_score >= 100 - max_blur_detected` |
+| `weights` | dict | Pesos personalizados de las métricas (opcional) |
 
 **Ejemplo:**
 
@@ -113,11 +114,25 @@ quality:
 
 **Métricas de calidad evaluadas:**
 
-- **Nitidez (sharpness)**: Varianza del Laplaciano
-- **Exposición**: Análisis del histograma de luminosidad
-- **Contraste**: Desviación estándar de la luminosidad
-- **Composición**: Posición del sujeto respecto a la regla de tercios
-- **Blur**: Detección de desenfoque mediante análisis de frecuencias
+- **Nitidez (sharpness)**: Varianza del Laplaciano normalizada (100-2000 → 0-100)
+- **Exposición**: Análisis del histograma de luminosidad (penaliza desvíos de ~15% oscuro / ~10% brillante)
+- **Contraste**: Desviación estándar de la luminosidad normalizada (20-80 → 0-100)
+- **Composición**: Entropía de Shannon de la imagen en escala de grises (complejidad visual, 4.0-7.5 bits → 0-100)
+- **Blur**: Varianza del Laplaciano (score **alto = nítido**; umbral 100)
+
+### Pesos personalizados (opcional)
+
+```yaml
+quality:
+  weights:
+    sharpness: 0.30
+    exposure: 0.20
+    contrast: 0.20
+    composition: 0.15
+    blur: 0.15
+```
+
+Si se omite, se usan los pesos por defecto del código. La suma debería ser 1.0.
 
 ### deduplication
 
@@ -188,10 +203,18 @@ Configuración del cliente de la API de iNaturalist.
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
 | `quality_grade` | string | Grado de calidad: `research`, `needs_id`, `casual` |
-| `rate_limit_calls` | integer | Llamadas máximas por período |
-| `rate_limit_period` | integer | Período en segundos |
+| `rate_limit_calls` | integer | Llamadas máximas por período (convención A) |
+| `rate_limit_period` | integer | Período en segundos para `rate_limit_calls` (convención A) |
+| `rate_limit_requests_per_minute` | integer | Requests máximos por minuto (convención B) |
+| `rate_limit_requests_per_day` | integer | Requests máximos por día (convención B) |
 | `max_retries` | integer | Reintentos en caso de error |
 | `timeout_seconds` | integer | Timeout de conexión en segundos |
+
+> **Convenciones de rate-limit:** se aceptan dos formas equivalentes:
+> - **A:** `rate_limit_calls` + `rate_limit_period` (llamadas por período en segundos; `requests_per_day` se deriva como `calls * 86400 / period`).
+> - **B:** `rate_limit_requests_per_minute` + `rate_limit_requests_per_day` (valores directos).
+>
+> Si se definen ambos, tiene prioridad la convención B. El cableado se realiza en `scripts/01_fetch_observations.py`.
 
 **Ejemplo:**
 

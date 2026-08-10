@@ -49,7 +49,7 @@ class ImageQualityAssessor:
     2. Exposure (histogram distribution) - Exposicion correcta
     3. Contrast (dynamic range) - Rango dinamico
     4. Composition (entropy) - Complejidad visual
-    5. Blur detection (frequency analysis) - Deteccion de desenfoque
+    5. Blur detection (Laplacian variance) - Deteccion de desenfoque
     
     Cada metrica retorna un score de 0-100.
     """
