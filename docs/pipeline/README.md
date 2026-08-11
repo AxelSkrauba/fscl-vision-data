@@ -57,36 +57,36 @@ python scripts/helpers/run_full_pipeline.py --config config/mi_config.yaml --ski
 
 ```
 config.yaml
-    │
-    ▼
-┌───────────────────┐
-│ 01_fetch          │──► observations.json
-└───────────────────┘
-    │
-    ▼
-┌───────────────────┐
-│ 02_download       │──► raw/{species}/*.jpg
-└───────────────────┘
-    │
-    ▼
-┌───────────────────┐
-│ 03_deduplicate    │──► observations_deduplicated.json
-└───────────────────┘
-    │
-    ▼
-┌───────────────────┐
-│ 04_assess_quality │──► observations_quality.json
-└───────────────────┘
-    │
-    ▼
-┌───────────────────┐
-│ 05_select_samples │──► observations_selected.json
-└───────────────────┘
-    │
-    ▼
-┌───────────────────┐
-│ 06_organize       │──► final_datasets/{name}/
-└───────────────────┘
+    |
+    v
++-------------------+
+| 01_fetch          |--> observations.json
++-------------------+
+    |
+    v
++-------------------+
+| 02_download       |--> raw/{species}/*.jpg
++-------------------+
+    |
+    v
++-------------------+
+| 03_deduplicate    |--> observations_deduplicated.json
++-------------------+
+    |
+    v
++-------------------+
+| 04_assess_quality |--> observations_quality.json
++-------------------+
+    |
+    v
++-------------------+
+| 05_select_samples |--> observations_selected.json
++-------------------+
+    |
+    v
++-------------------+
+| 06_organize       |--> final_datasets/{name}/
++-------------------+
 ```
 
 ## Archivos Intermedios

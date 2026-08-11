@@ -1,6 +1,7 @@
 # FSCL-Vision Data Pipeline
 
 [![Tests](https://github.com/AxelSkrauba/fscl-vision-data/actions/workflows/tests.yml/badge.svg)](https://github.com/AxelSkrauba/fscl-vision-data/actions/workflows/tests.yml)
+[![Docs](https://github.com/AxelSkrauba/fscl-vision-data/actions/workflows/docs.yml/badge.svg)](https://axelskrauba.github.io/fscl-vision-data/)
 [![Python Versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AxelSkrauba/fscl-vision-data)

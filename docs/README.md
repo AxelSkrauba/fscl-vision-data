@@ -47,65 +47,65 @@ Documentación técnica de cada módulo del código fuente:
 ## Flujo del Pipeline
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        FSCL-Vision Data Pipeline                    │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  1. FETCH OBSERVATIONS                                              │
-│     - Consulta iNaturalist API                                      │
-│     - Aplica filtros geográficos y taxonómicos                      │
-│     - Respeta rate-limiting                                         │
-│     - Cachea respuestas localmente                                  │
-│     Salida: observations.json                                       │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  2. DOWNLOAD IMAGES                                                 │
-│     - Descarga imágenes en paralelo                                 │
-│     - Valida integridad de archivos                                 │
-│     - Guarda metadatos por imagen                                   │
-│     Salida: raw/{species}/*.jpg + *.json                            │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  3. DEDUPLICATE                                                     │
-│     - Agrupa por especie                                            │
-│     - Clustering DBSCAN espacio-temporal                            │
-│     - Selecciona mejor observación por cluster                      │
-│     Salida: observations_deduplicated.json                          │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  4. ASSESS QUALITY                                                  │
-│     - Evalúa nitidez, exposición, contraste                         │
-│     - Calcula score compuesto                                       │
-│     - Filtra por umbrales de calidad                                │
-│     Salida: observations_quality.json                               │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  5. SELECT SAMPLES                                                  │
-│     - Aplica método de selección (quality/clustering/stratified)    │
-│     - Balancea entre especies si está configurado                   │
-│     - Filtra especies con mínimo insuficiente                       │
-│     Salida: observations_selected.json                              │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  6. ORGANIZE DATASET                                                │
-│     - Crea estructura de directorios                                │
-│     - Copia imágenes seleccionadas                                  │
-│     - Genera manifests y metadatos                                  │
-│     - Valida integridad del dataset                                 │
-│     Salida: final_datasets/{dataset_name}/                          │
-└─────────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------+
+|                        FSCL-Vision Data Pipeline                    |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  1. FETCH OBSERVATIONS                                              |
+|     - Consulta iNaturalist API                                      |
+|     - Aplica filtros geograficos y taxonomicos                      |
+|     - Respeta rate-limiting                                         |
+|     - Cachea respuestas localmente                                  |
+|     Salida: observations.json                                       |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  2. DOWNLOAD IMAGES                                                 |
+|     - Descarga imagenes en paralelo                                 |
+|     - Valida integridad de archivos                                 |
+|     - Guarda metadatos por imagen                                   |
+|     Salida: raw/{species}/*.jpg + *.json                            |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  3. DEDUPLICATE                                                     |
+|     - Agrupa por especie                                            |
+|     - Clustering DBSCAN espacio-temporal                            |
+|     - Selecciona mejor observacion por cluster                      |
+|     Salida: observations_deduplicated.json                          |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  4. ASSESS QUALITY                                                  |
+|     - Evalua nitidez, exposicion, contraste                         |
+|     - Calcula score compuesto                                       |
+|     - Filtra por umbrales de calidad                                |
+|     Salida: observations_quality.json                               |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  5. SELECT SAMPLES                                                  |
+|     - Aplica metodo de seleccion (quality/clustering/stratified)    |
+|     - Balancea entre especies si esta configurado                   |
+|     - Filtra especies con minimo insuficiente                       |
+|     Salida: observations_selected.json                              |
++---------------------------------------------------------------------+
+                                    |
+                                    v
++---------------------------------------------------------------------+
+|  6. ORGANIZE DATASET                                                |
+|     - Crea estructura de directorios                                |
+|     - Copia imagenes seleccionadas                                  |
+|     - Genera manifests y metadatos                                  |
+|     - Valida integridad del dataset                                 |
+|     Salida: final_datasets/{dataset_name}/                          |
++---------------------------------------------------------------------+
 ```
 
 ## Inicio Rápido
